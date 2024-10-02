@@ -4,6 +4,7 @@ const PORT = 8080;
 app.use(express.json());
 app.listen(PORT, () => console.log("running on http://localhost:${PORT}")); // to listen on the port for any api
 
+const connection = require("./db_connections/dbConnect");
 app.get("/test", (req, res) => {
   res.status(200).send({
     name: "ASW project",
