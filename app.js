@@ -7,7 +7,7 @@ app.listen(PORT, () => console.log("running on http://localhost:${PORT}")); // t
 app.get("/test", (req, res) => {
   res.status(200).send({
     name: "ASW project",
-    message: "Hello",
+    message: "Helloo",
   });
 });
 
