@@ -1,0 +1,30 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const rentalRoutes = require('./routes/rentals'); // Adjust the path as necessary
+
+const app = express();
+// const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(bodyParser.json());
+
+
+app.use('/api/rentals', rentalRoutes);
+
+
+const port = 3000;
+const host = '192.168.88.5';  // Your machine's IP address
+
+const server = app.listen(port, host, () => {
+    console.log(`App listening at http://${host}:${port}/`);
+});
+
+// Set up Socket.IO
+const io = require('socket.io')(server, {
+    pingTimeout: 60000,
+    cors: {
+        origin: `http://${host}:${port}`,  // Allow connections from the same IP and port
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
