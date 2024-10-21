@@ -18,14 +18,14 @@ const {
 
 
 
-  router.post("/addUserReview", addUserReview);
-  router.post("/addRentalReview", addRentalReview);
-  router.get("/viewRentalReview/:rental_id", viewRentalReview);
-  router.get("/viewUserReviews/:Userid", viewUserReviews);
-  router.put("/editReview/:review_id", editReview );
+  router.post("/newUserReview", addUserReview);
+  router.post("/newRentalReview", addRentalReview);
+  router.get("/RentalReview/:rental_id", viewRentalReview);
+  router.get("/UserReviews/:Userid", viewUserReviews);
+  router.put("/Review/Info/:review_id", editReview );
   // router.put('/editRentalReviews', editRentalReviews);
-  router.post("/deleteReview/:review_id", deleteReviews);
-  router.get("/searchReview/:name", searchReview);
+  router.post("/Review/:review_id", deleteReviews);
+  router.get("/Review/data/:name", searchReview);
 
 
 

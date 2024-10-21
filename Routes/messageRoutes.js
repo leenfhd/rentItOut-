@@ -15,13 +15,13 @@ const {
  
  //for user ...
 // /api/viewUserOFItem renter and rental info       -----Done
-router.post('/viewUserOFItem/:id', viewUserOFItem);
+router.post('/UserOFItem/:id', viewUserOFItem);
 
    // /api/saveMsg between two users        -----Done
- router.post("/saveMsg", saveMsg);
+ router.post("/newMessage", saveMsg);
 
 // /api/viewAllUser  info       -----Done
-router.get('/viewAllUser', viewAllUser);
+router.get('/AllUser', viewAllUser);
 
 
 // /api/userDetailsChat user who chat with    -----Done
@@ -31,7 +31,7 @@ router.get('/viewAllUser', viewAllUser);
 router.get("/messages/:senderId/:recepientId", fetchMsg);
  
  // /api/deleteMessages acoording mesdage_id     -----Done
-  router.post("/deleteMessages", deleteMessages);
+  router.post("/Messages", deleteMessages);
 
  
  // /api/viewAdmin
