@@ -47,7 +47,6 @@ const User = {
     return new Promise((resolve, reject) => {
       connection.query(sql, [email], async (err, results) => {
         if (err) {
-          console.log(err);
           return reject(err); // Reject the promise if there's an error
         }
 
@@ -75,7 +74,6 @@ const User = {
     return new Promise((resolve, reject) => {
       connection.query(sql, [userId], (err, results) => {
         if (err) {
-          console.log(err);
           return reject(err); // Reject the promise if there's an error
         }
 
