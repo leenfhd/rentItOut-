@@ -84,81 +84,45 @@ const getAllRentals = async (req, res) => {
         });
     }
 };
-const getRentalById = async (req, res) => {
+
+const getRentals = async (req, res) => {
     try {
-        const rentalId = req.params.id;
+        const { rental_id, renter_id,owner_id, item_id, status } = req.query; // Expect query parameters
 
-        const sql =`SELECT * FROM  rentals WHERE rental_id= ?`;
+        let sql = "SELECT * FROM rentals WHERE 1 = 1";
+        const queryParams = [];
 
-        db.query(sql,[rentalId] ,(error, results) => {
-            if (error) {
-                console.error('Error retrieving rental:', error);
-                return res.status(500).json({
-                    message: 'Error retrieving rental',
-                    error: error.message
-                });
-            }
-            if (results.length === 0) {
-                return res.status(404).json({
-                    message: "No rental found with thid id"
-                });
-            }
-    
-            return res.status(200).json({
-                message: 'Rental retrieved successfully',
-                rental: results // Return the list of rentals
+        
+        if (rental_id) {
+            sql += " AND rental_id = ?";
+            queryParams.push(rental_id);
+        }
+        if (renter_id) {
+            sql += " AND renter_id = ?";
+            queryParams.push(renter_id);
+        }
+        if (owner_id) {
+            sql += " AND owner_id = ?";
+            queryParams.push(owner_id);
+        }
+        if (item_id) {
+            sql += " AND item_id = ?";
+            queryParams.push(item_id);
+        }
+        if (status) {
+            sql += " AND status = ?";
+            queryParams.push(status);
+        }
+
+        
+        if (queryParams.length === 0) {
+            return res.status(400).json({
+                message: "Please provide at least one parameter: rental_id, renter_id,owner_id, item_id or status"
             });
-        });
+        }
 
-    } catch (error) {
-        console.error("Error getting rental:", error);
-        return res.status(500).json({
-            message: "Error getting rental",
-            error: error.message || "An error occurred"
-        });
-    }
-};
-const getRentalsByUser = async (req, res) => {
-    try {
-        const userID = req.params.id;
-
-        const sql =`SELECT * FROM  rentals WHERE renter_id= ?`;
-
-        db.query(sql,[userID] ,(error, results) => {
-            if (error) {
-                console.error('Error retrieving rental:', error);
-                return res.status(500).json({
-                    message: 'Error retrieving rental',
-                    error: error.message
-                });
-            }
-            if (results.length === 0) {
-                return res.status(404).json({
-                    message: "This user hasn't rented anything yet!"
-                });
-            }
-    
-            return res.status(200).json({
-                message: 'Rental retrieved successfully',
-                rental: results // Return the list of rentals
-            });
-        });
-
-    } catch (error) {
-        console.error("Error getting rental:", error);
-        return res.status(500).json({
-            message: "Error getting rental",
-            error: error.message || "An error occurred"
-        });
-    }
-};
-const getRentalsByItem = async (req, res) => {
-    try {
-        const itemId = req.params.id;
-
-        const sql =`SELECT * FROM  rentals WHERE item_id= ?`;
-
-        db.query(sql,[itemId] ,(error, results) => {
+  
+        db.query(sql, queryParams, (error, results) => {
             if (error) {
                 console.error('Error retrieving rentals:', error);
                 return res.status(500).json({
@@ -166,195 +130,124 @@ const getRentalsByItem = async (req, res) => {
                     error: error.message
                 });
             }
+
             if (results.length === 0) {
                 return res.status(404).json({
-                    message: "This item hasn't rented yet!"
+                    message: "No rentals found with the provided criteria"
                 });
             }
-    
+
             return res.status(200).json({
                 message: 'Rentals retrieved successfully',
-                rental: results // Return the list of rentals
+                rentals: results
             });
         });
-
     } catch (error) {
-        console.error("Error getting rental:", error);
+        console.error("Error getting rentals:", error);
         return res.status(500).json({
-            message: "Error getting rental",
+            message: "Error getting rentals",
             error: error.message || "An error occurred"
         });
     }
 };
-const updateStatus = async (req, res) => {
+
+
+const updateRental = async (req, res) => {
     try {
-        const rentalId = req.params.id;
-        const newstatus = req.body.status;
+        const rental_id = req.params.id;
+        const { status, total_price, start_date, end_date } = req.body;
 
-
-        const sql =`UPDATE rentals set status = ? WHERE rental_id= ?`;
-
-        db.query(sql,[newstatus,rentalId] ,(error, results) => {
-            if (error) {
-                console.error('Error updating status:', error);
-                return res.status(500).json({
-                    message: 'Error updating status',
-                    error: error.message
-                });
-            }
-            if (results.affectedRows === 0) {
-                return res.status(404).json({
-                    message: "Rental not found or status not changed"
-                });
-            }
-    
-            const selectSql = 'SELECT * FROM rentals WHERE rental_id = ?';
-            db.query(selectSql, [rentalId], (selectError, rentalResults) => {
-            if (selectError) {
-                console.error("Error retrieving updated rental:", selectError);
-                return res.status(500).json({
-                    message: "Error retrieving updated rental",
-                    error: selectError.message || "An error occurred"
-                });
-            }
-
-            // Send back the updated rental data
-            return res.status(200).json({
-                message: "Rental status updated successfully",
-                updatedRental: rentalResults[0] // Send the first and only result
-            });
-        });
-        });
-
-    } catch (error) {
-        console.error("Error updating rental:", error);
-        return res.status(500).json({
-            message: "Error updating rental",
-            error: error.message || "An error occurred"
-        });
-    }
-};
-
-
-const updatePrice = async (req, res) => {
-    try {
-        const rentalId = req.params.id;
-        const price = req.body.total_price;
-
-
-        const sql =`UPDATE rentals set total_price = ? WHERE rental_id= ?`;
-
-        db.query(sql,[price,rentalId] ,(error, results) => {
-            if (error) {
-                console.error('Error updating price:', error);
-                return res.status(500).json({
-                    message: 'Error updating price',
-                    error: error.message
-                });
-            }
-            if (results.affectedRows === 0) {
-                return res.status(404).json({
-                    message: "Rental not found or price not changed"
-                });
-            }
-    
-            const selectSql = 'SELECT * FROM rentals WHERE rental_id = ?';
-            db.query(selectSql, [rentalId], (selectError, rentalResults) => {
-            if (selectError) {
-                console.error("Error retrieving updated rental:", selectError);
-                return res.status(500).json({
-                    message: "Error retrieving updated rental",
-                    error: selectError.message || "An error occurred"
-                });
-            }
-
-            // Send back the updated rental data
-            return res.status(200).json({
-                message: "Rental price updated successfully",
-                updatedRental: rentalResults[0] // Send the first and only result
-            });
-        });
-        });
-
-    } catch (error) {
-        console.error("Error updating rental:", error);
-        return res.status(500).json({
-            message: "Error updating rental",
-            error: error.message || "An error occurred"
-        });
-    }
-};
-const updateDates = (req, res) => {
-    const rentalId = req.params.id; 
-    const { start_date, end_date } = req.body;
-
-
-    if (!start_date && !end_date) {
-        return res.status(400).json({
-            message: "Please provide at least one of start_date or end_date to update"
-        });
-    }
-    if (start_date && end_date) {
-        const startDate = new Date(start_date);
-        const endDate = new Date(end_date);
-        if (startDate >= endDate) {
+        // Check if at least one field is provided for updating
+        if (!status && !total_price && !start_date && !end_date) {
             return res.status(400).json({
-                message: "Start date must be before end date"
-            });
-        }
-    }
-
-
-    let updateFields = [];
-    let values = [];
-
-    if (start_date) {
-        updateFields.push("start_date = ?");
-        values.push(start_date);
-    }
-    if (end_date) {
-        updateFields.push("end_date = ?");
-        values.push(end_date);
-    }
-
-    const updateSql = `UPDATE rentals SET ${updateFields.join(', ')} WHERE rental_id = ?`;
-    values.push(rentalId); 
-
-
-    db.query(updateSql, values, (error, results) => {
-        if (error) {
-            console.error("Error updating rental dates:", error);
-            return res.status(500).json({
-                message: "Error updating rental dates",
-                error: error.message || "An error occurred"
+                message: "Please provide at least one field to update (status, price, start_date, end_date)"
             });
         }
 
-      if (results.affectedRows === 0) {
-            return res.status(404).json({
-                message: "Rental not found or dates not changed"
-            });
+        // Start building the update query dynamically
+        let updateFields = [];
+        let values = [];
+
+        // Add status to the update if it's provided
+        if (status) {
+            updateFields.push("status = ?");
+            values.push(status);
         }
 
+        // Add total_price to the update if it's provided
+        if (total_price) {
+            updateFields.push("total_price = ?");
+            values.push(total_price);
+        }
 
-        const selectSql = 'SELECT * FROM rentals WHERE rental_id = ?';
-        db.query(selectSql, [rentalId], (selectError, rentalResults) => {
-            if (selectError) {
-                console.error("Error retrieving updated rental:", selectError);
+        // Validate and add start_date and end_date to the update if provided
+        if (start_date) {
+            updateFields.push("start_date = ?");
+            values.push(start_date);
+        }
+        if (end_date) {
+            updateFields.push("end_date = ?");
+            values.push(end_date);
+        }
+
+        // Ensure that start_date is before end_date (if both are provided)
+        if (start_date && end_date) {
+            const startDateObj = new Date(start_date);
+            const endDateObj = new Date(end_date);
+            if (startDateObj >= endDateObj) {
+                return res.status(400).json({
+                    message: "Start date must be before end date"
+                });
+            }
+        }
+
+        // Build the SQL query dynamically
+        const updateSql = `UPDATE rentals SET ${updateFields.join(', ')} WHERE rental_id = ?`;
+        values.push(rental_id);  // Append rental ID as the last value
+
+        // Execute the update query
+        db.query(updateSql, values, (error, results) => {
+            if (error) {
+                console.error('Error updating rental:', error);
                 return res.status(500).json({
-                    message: "Error retrieving updated rental",
-                    error: selectError.message || "An error occurred"
+                    message: 'Error updating rental',
+                    error: error.message
                 });
             }
 
-            // Send back the updated rental data
-            return res.status(200).json({
-                message: "Rental dates updated successfully",
-                updatedRental: rentalResults[0] // Send the first and only result
+            if (results.affectedRows === 0) {
+                return res.status(404).json({
+                    message: "Rental not found or no fields updated"
+                });
+            }
+
+            // Fetch the updated rental details to return
+            const selectSql = 'SELECT * FROM rentals WHERE rental_id = ?';
+            db.query(selectSql, [rental_id], (selectError, rentalResults) => {
+                if (selectError) {
+                    console.error("Error retrieving updated rental:", selectError);
+                    return res.status(500).json({
+                        message: "Error retrieving updated rental",
+                        error: selectError.message || "An error occurred"
+                    });
+                }
+
+                return res.status(200).json({
+                    message: "Rental updated successfully",
+                    updatedRental: rentalResults[0]
+                });
             });
         });
-    });
+    } catch (error) {
+        console.error("Error updating rental:", error);
+        return res.status(500).json({
+            message: "Error updating rental",
+            error: error.message || "An error occurred"
+        });
+    }
 };
+
+
 
 const updateLateFeesController = (req, res) => {
     const { rental_id, returnDate, lateFeePerDay } = req.body;
@@ -363,7 +256,7 @@ const updateLateFeesController = (req, res) => {
         return res.status(400).json({ message: "Missing required fields: rental_id, returnDate, lateFeePerDay" });
     }
 
-    // Fetch the rental data from the database using the rental_id
+    
     const query = 'SELECT end_date, late_fee FROM rentals WHERE rental_id = ?';
     
     db.query(query, [rental_id], (err, results) => {
@@ -454,12 +347,8 @@ const deleteRental = async (req, res) => {
 
 module.exports = { registerRental,
     getAllRentals,
-    getRentalById,
-    getRentalsByUser,
-    getRentalsByItem,
-    updateStatus,
-    updateDates,
-    updatePrice,
     updateLateFeesController,
-    deleteRental
+    deleteRental,
+    getRentals,
+    updateRental
  };

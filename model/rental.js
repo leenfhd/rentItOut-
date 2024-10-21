@@ -1,4 +1,4 @@
-// Define the Rental model as an object (optional, for structure)
+
 const Rental = {
     rental_id: null,
     item_id: null,
