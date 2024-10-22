@@ -1,23 +1,18 @@
-const express = require("express"); // to import express
+const express = require("express"); // Import express
+const itemRouter = require("./routes/itemRouter"); // Import the item router
+const connection = require("./db_connections/dbConnect"); // Import the DB connection
+const wishlistRouter = require("./routes/wishlistRouter");
+const couponRouter = require("./routes/couponRouter");
+
 const app = express();
 const PORT = 8080;
-app.use(express.json());
-app.listen(PORT, () => console.log("running on http://localhost:${PORT}")); // to listen on the port for any api
 
-const connection = require("./db_connections/dbConnect");
-app.get("/test", (req, res) => {
-  res.status(200).send({
-    name: "ASW project",
-    message: "Helloo",
-  });
-});
+app.use(express.json()); // Middleware to parse JSON
 
-app.post("/test:name", (req, res) => {
-  const { name } = req.params;
-  const { data } = req.body;
-  /*if (!data) {
-    res.status(404).send({ message: "data not found" });
-  }*/
+// Route for item-related operations
+app.use("/rentItOut/items", itemRouter);
+app.use("/rentItOut/wishlists", wishlistRouter);
+app.use("/rentItOut/coupons", couponRouter);
 
-  res.status(200).send({ message: "sucess" });
-});
+// Start the server
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
