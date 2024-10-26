@@ -8,6 +8,8 @@ const wishlistRouter = require("./routes/wishlistRouter");
 const couponRouter = require("./routes/couponRouter");
 const notificationRouter = require("./routes/notificationRouter");
 const rentalRouter = require("./routes/rentalRouter");
+const ReviewRoutes = require("./routes/reviewRoutes.js");
+const MessageRoute = require("./routes/messageRoutes.js");
 
 const app = express();
 const PORT = 8080;
@@ -24,3 +26,5 @@ app.use("/rentItOut/wishlists", wishlistRouter);
 app.use("/rentItOut/coupons", couponRouter);
 app.use("/rentItOut/notifications", notificationRouter);
 app.use("/rentItOut/rentals", rentalRouter);
+app.use("/rentItOut/message/", MessageRoute);
+app.use("/rentItOut/review/", ReviewRoutes);
