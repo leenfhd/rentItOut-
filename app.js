@@ -6,6 +6,8 @@ const insuranceRouter = require("./routes/insuranceRouter");
 const itemRouter = require("./routes/itemRouter"); // Import the item router
 const wishlistRouter = require("./routes/wishlistRouter");
 const couponRouter = require("./routes/couponRouter");
+const notificationRouter = require("./routes/notificationRouter");
+const rentalRouter = require("./routes/rentalRouter");
 
 const app = express();
 const PORT = 8080;
@@ -20,3 +22,5 @@ app.use("/rentItOut/insurance", insuranceRouter);
 app.use("/rentItOut/items", itemRouter);
 app.use("/rentItOut/wishlists", wishlistRouter);
 app.use("/rentItOut/coupons", couponRouter);
+app.use("/rentItOut/notifications", notificationRouter);
+app.use("/rentItOut/rentals", rentalRouter);
