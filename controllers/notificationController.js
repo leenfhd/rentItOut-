@@ -83,9 +83,39 @@ const getUserNotifications = async (req, res) => {
 };
 const markAsRead = async (req, res) => {
   try {
+    const token =
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+        ? req.headers.authorization.split(" ")[1]
+        : null;
+
+    // If no token is provided, return unauthorized error
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "You are not authorized. Please log in." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
     const notificationId = req.params.id;
 
-    const sql = `UPDATE notifications set status = ? WHERE notification_id= ?`;
+    const [user] = await db.promise().query(`SELECT user_id FROM notifications WHERE notification_id=?`,[notificationId]);
+
+    if(user.length===0){
+      return res.status(404).json({
+        message:"user not found"
+      });
+
+    }
+    const notificationUser=user[0].user_id;
+    if(notificationUser!== userId){
+      res.status(403).json({
+        message:"This notification is not in your notification list"
+      });
+    }
+
+    const sql = `UPDATE notifications SET status = ? WHERE notification_id= ?`;
 
     db.query(sql, ["read", notificationId], (error, results) => {
       if (error) {
@@ -135,12 +165,45 @@ const markAsRead = async (req, res) => {
 };
 const deleteNotification = async (req, res) => {
   try {
+    
     const notificationId = req.params.id;
     if (!notificationId) {
       return res
         .status(400)
         .json({ message: "Missing notification_id parameter" });
     }
+
+    const token =
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+      ? req.headers.authorization.split(" ")[1]
+      : null;
+
+  // If no token is provided, return unauthorized error
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "You are not authorized. Please log in." });
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const userId = decoded.id;
+
+
+  const [user] = await db.promise().query(`SELECT user_id FROM notifications WHERE notification_id=?`,[notificationId]);
+
+  if(user.length===0){
+    return res.status(404).json({
+      message:"Notification not found"
+    });
+
+  }
+  const notificationUser=user[0].user_id;
+  if(notificationUser!== userId){
+    return res.status(403).json({
+      message:"This notification is not in your notification list"
+    });
+  }
 
     const sql = `DELETE FROM notifications WHERE notification_id= ?`;
 

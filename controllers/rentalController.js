@@ -10,7 +10,7 @@ const registerRental = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const renter_id = decoded.id;
 
-    const getItem = `SELECT owner_id, price_per_day, availability_status FROM item WHERE item_id = ?`;
+    const getItem = `SELECT owner_id, price_per_day, availability_status ,name as item_name  FROM item WHERE item_id = ?`;
     const [itemResult] = await db.promise().query(getItem, [item_id]);
     if (itemResult.length === 0) {
       return res.status(404).json({ message: "Item not found" });
@@ -18,7 +18,9 @@ const registerRental = async (req, res) => {
 
     const owner_id = itemResult[0].owner_id;
     const price_per_day = itemResult[0].price_per_day;
-    const availability_status = itemResult[0].availability_status
+    const availability_status = itemResult[0].availability_status;
+    const item_name=itemResult[0].item_name;
+
 
     //Check for availability of the item
     if(availability_status !="available"){
@@ -77,6 +79,18 @@ const registerRental = async (req, res) => {
         rentalId: results.insertId, // Return the inserted ID
       });
     });
+    const getUser = `SELECT first_name,last_name FROM users WHERE user_id = ?`;
+    const [userResult] = await db.promise().query(getUser, [renter_id]);
+    const firstName = userResult[0].first_name;
+    const lastName = userResult[0].last_name;
+
+    const notificationMessage= `${firstName} ${lastName}  requested to rent the item "${item_name}" from ${start_date} to ${end_date}`;
+    const status ="unread";
+
+    const sendNotification=`INSERT INTO notifications (user_id, message, status, created_at) VALUES (?, ?, ?, ?)`;
+    const notificationData = [owner_id, notificationMessage, status, new Date()];
+    await db.promise().query(sendNotification,notificationData);
+
   } catch (error) {
     console.error("Error request for rental:", error);
     return res.status(500).json({
@@ -371,15 +385,21 @@ const acceptOrDenyRental = async (req, res) => {
 
     // Update the rental status based on the action
     const item_id=rental[0].item_id;
+    const renter_id=rental[0].renter_id;
+
     let newStatus;
+    let notificationMessage;
     if (action === "accept") {
       newStatus = "ongoing";
+      notificationMessage= `Your request to rent item ${item_id} has been accepted`;
+
 
       //update the availability of the item 
       await db.promise().query("UPDATE item SET availability_status = 'unavailable' WHERE item_id=?", [item_id]);
 
     } else if (action === "deny") {
       newStatus = "cancelled";
+      notificationMessage=`Your request to rent item ${item_id} has been denied`;
     } else {
       return res
         .status(400)
@@ -393,6 +413,16 @@ const acceptOrDenyRental = async (req, res) => {
         newStatus,
         rental_id,
       ]);
+
+      const notificationSql = `INSERT INTO notifications (user_id, message, status, created_at) VALUES (?, ?, ?, ?)`;
+      await db
+        .promise()
+        .query(notificationSql, [
+          renter_id,
+          notificationMessage,
+          "unread",
+          new Date(),
+        ]);
 
     return res.status(200).json({
       message: `Rental ${action}ed successfully.`,
