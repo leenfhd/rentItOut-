@@ -11,8 +11,9 @@ const rentalRouter = require("./routes/rentalRouter");
 
 const app = express();
 const PORT = 8080;
+
 app.use(express.json());
-app.listen(PORT, () => console.log(`running on http://localhost:${PORT}`)); // to listen on the port for any api
+app.listen(PORT, () => console.log(`running on http:// 192.168.88.9:${PORT}`)); // to listen on the port for any api
 
 const connection = require("./db_connections/dbConnect");
 
