@@ -9,6 +9,7 @@ const connection = require("../db_connections/dbConnect");
 require("dotenv").config();
 const AppError = require("../utils/appError");
 exports.signup = catchAsync(async (req, res, next) => {
+  console.log(req.body);
   const {
     first_name,
     last_name,
