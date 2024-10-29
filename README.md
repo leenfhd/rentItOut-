@@ -11,7 +11,9 @@ Easy Renting for many needs
     <br />
     <br />
     <a href="#">View Our Demo</a>
-    ·
+    .
   </p>
   </div>
-## GitHub Repository Information :small_blue_diamond:
+  
+  # About the project :grey_question:
+  <strong>RentItOut</strong> is a collaborative project for the Advanced Software Engineering course. It aims to provide an easy rental process through a platform that offers a trustworthy variety of items for rent. In addition, it facilitates easy communication among users, includes features such as notifications and chatting, and incorporates rating functionalities.
