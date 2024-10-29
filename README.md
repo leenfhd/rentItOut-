@@ -13,5 +13,5 @@ Easy Renting for many needs
     <a href="#">View Our Demo</a>
     ·
   </p>
-</div>
-## GitHub Repository Information :
+  </div>
+  # GitHub Repository Information :
