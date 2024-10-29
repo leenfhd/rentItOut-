@@ -1,2 +1,6 @@
- # RentItOut
-![rent](https://github.com/user-attachments/assets/584d3f2e-6fb2-4139-bdc1-eef469f70822)
+<div align="center">
+  <a href="https://github.com/leenfhd/rentItOut-">
+    <img src="public/images/rent.png" alt="Logo">
+  </a>
+
+  <h3 align="center">RentItOut</h3>
