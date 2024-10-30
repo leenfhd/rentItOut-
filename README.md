@@ -209,6 +209,10 @@ Feel free to explore the interface, features, and overall user experience. Your 
 <p align="right"> <a href="https://github.com/leenfhd/rentItOut-/graphs/contributors"><img src="https://img.shields.io/github/contributors/leenfhd/rentItOut-" alt="contributors" /></a> </p>
 <p align="center"><a href="https://github.com/leenfhd/rentItOut-/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=leenfhd/rentItOut-" />
+  <img src="https://contrib.rocks/image?repo=leenfhd/rentItOut-" />
+  <img src="https://contrib.rocks/image?repo=leenfhd/rentItOut-" />
+  <img src="https://contrib.rocks/image?repo=leenfhd/rentItOut-" />
+  
 </a> </p>
 
 
@@ -221,7 +225,7 @@ For questions or feedback, please reach out to our team:
 
 - **Leen Fahed**  - [fahedleen@gmail.com](mailto:fahedleen@gmail.com)
 - **Marah Qadi**  - [marahqadi@gmail.com](marahqadi@gmail.com)
-- **Marah Shakhsheer**  - [your-email3@example.com](mailto:your-email3@example.com)
+- **Marah Shakhsheer**  - [s12027722@stu.najah.edu](mailto:s12027722@stu.najah.edu)
 - **Raghad Mustafa**  - [raghadmatar2002@gmail.com](mailto:raghadmatar2002@gmail.com)
 
 We appreciate your input and are always looking to improve!
