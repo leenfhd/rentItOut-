@@ -74,8 +74,8 @@ This project is actively maintained and open for contributions. Check out the do
 ## ⚙️ Extra Features
 - **User Privacy and Data Security**: Secure user data with privacy measures like jwt and encryption for passwords.
 - **Role Management**: Different roles (e.g., renter, owner,both, admin) with specific permissions.
-- **Error Handling and Logging**: Comprehensive error handling and logging mechanisms.
-- **GUI Integreation**: Frontend demonstration by flutter.
+- **External Api integration**: for getting current address of the user and another one for zego cloud  for virsual meetings.
+- **GUI Integreation**: Frontend demonstration by flutter for easy use.
 - **Chatting system**: Real Time chatting.
   <p align="right"><a href="#home">⬆️ Top</a></p>
 <br>
