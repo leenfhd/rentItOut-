@@ -14,8 +14,6 @@
 ## 🏷️ Badges
 
 ![GitHub issues](https://img.shields.io/github/issues/leenfhd/rentItOut-)
-![GitHub forks](https://img.shields.io/github/forks/leenfhd/rentItOut-)
-![GitHub stars](https://img.shields.io/github/stars/leenfhd/rentItOut-)
 ![GitHub contributors](https://img.shields.io/github/contributors/leenfhd/rentItOut-)
 ![GitHub last commit](https://img.shields.io/github/last-commit/leenfhd/rentItOut-)
 
@@ -221,10 +219,10 @@ Feel free to explore the interface, features, and overall user experience. Your 
 
 For questions or feedback, please reach out to our team:
 
-- **Leen Fahed**  - [your-email1@example.com](mailto:your-email1@example.com)
-- **Marah Qadi**  - [your-email2@example.com](mailto:your-email2@example.com)
+- **Leen Fahed**  - [fahedleen@gmail.com](mailto:fahedleen@gmail.com)
+- **Marah Qadi**  - [marahqadi@gmail.com](marahqadi@gmail.com)
 - **Marah Shakhsheer**  - [your-email3@example.com](mailto:your-email3@example.com)
-- **Raghad**  - [your-email4@example.com](mailto:your-email4@example.com)
+- **Raghad Mustafa**  - [raghadmatar2002@gmail.com](mailto:raghadmatar2002@gmail.com)
 
 We appreciate your input and are always looking to improve!
 
@@ -241,5 +239,6 @@ We appreciate your input and are always looking to improve!
 [MySQLURL]: https://www.mysql.com/
 [GitHub]: https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white
 [GitHubURL]: https://github.com/
-[Flutter]: https://images.search.yahoo.com/search/images;_ylt=Awrig4keYSJnBRwBkT5XNyoA;_ylu=Y29sbwNiZjEEcG9zAzEEdnRpZAMEc2VjA3BpdnM-?p=flutter+image&fr2=piv-web&type=E210US91215G0&fr=mcafee#id=0&iurl=https%3A%2F%2Fi2.wp.com%2Fsoftwareengineeringdaily.com%2Fwp-content%2Fuploads%2F2018%2F10%2Fflutter.jpg%3Ffit%3D1570%2C1500%26ssl%3D1&action=click
+[Flutter]:  https://img.shields.io/badge/Flutter-4479A1?style=for-the-badge&logo=flutter&logoColor=white
+[FlutterURL]: https://flutter.dev/
 [rentItOut]: https://github.com/leenfhd/rentItOut-
