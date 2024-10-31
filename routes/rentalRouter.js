@@ -4,6 +4,7 @@ const rentalController = require("../controllers/rentalController"); // Adjust t
 
 // Register a new rental
 router.post("/Rentals", rentalController.registerRental);
+router.post("/addRentals", rentalController.addRental);
 router.get("/AllRentals", rentalController.getAllRentals);
 router.post("/Fees", rentalController.updateLateFeesController);
 router.delete("/:id", rentalController.deleteRental);

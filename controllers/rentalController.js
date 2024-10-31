@@ -2,13 +2,131 @@ const Rental = require("../models/rentalModel"); // Adjust the path as necessary
 const db = require("../db_connections/dbConnect");
 const jwt = require("jsonwebtoken");
 const { message } = require("../models/notificationModel");
+const catchAsync = require("../utils/catchAsync");
 // Controller function to register rental
-const registerRental = async (req, res) => {
+const registerRental = catchAsync (async(req, res,next) => {
   try {
-    const { item_id, start_date, end_date } = req.body;
+    const { item_id, start_date, end_date,code } = req.body;
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const renter_id = decoded.id;
+
+    const getItem = `SELECT owner_id, price_per_day, availability_status ,name as item_name  FROM item WHERE item_id = ?`;
+    const [itemResult] = await db.promise().query(getItem, [item_id]);
+    if (itemResult.length === 0) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+    const getCoupon = `SELECT *  FROM coupons WHERE code = ?`;
+    const [couponResult] = await db.promise().query(getCoupon, [code]);
+    if (couponResult.length === 0) {
+      return res.status(404).json({ message: "There is no coupon with this code" });
+    }
+
+
+    const owner_id = itemResult[0].owner_id;
+    const price_per_day = itemResult[0].price_per_day;
+    const availability_status = itemResult[0].availability_status;
+    const item_name=itemResult[0].item_name;
+    const discount=couponResult[0].discount_percent;
+    const valid_from=new Date(couponResult[0].valid_from);
+    const valid_until=new Date(couponResult[0].valid_until);
+    const currentDate=new Date();
+
+
+        ///check for coupon
+    if(currentDate<valid_from && currentDate>valid_until){//unavailable
+          return res.status(400).json({
+            message:"The coupon in not valid for thr current date"
+          })
+    }
+    //Check for availability of the item
+    if(availability_status !="available"){
+      const itemRentingHistory = `SELECT end_date FROM rentals Where item_id=? and status='ongoing' ORDER BY end_date DESC LIMIT 1`;
+
+      const [itemHistory]=await db.promise().query(itemRentingHistory,[item_id]);
+      if(itemHistory .length>0){//there is a previous rental for this item
+        const previousRentalEndDate= new Date(itemHistory[0].end_date);
+        const requestStartDate= new Date(start_date);
+
+        if(previousRentalEndDate >= requestStartDate){//unavailable
+          return res.status(400).json({
+            message:"Item is already rented on the requested days"
+          });
+        }
+        }else{
+          return res.status(400).json({
+            message: "Item is currently unavailable for new rentals.",
+          });
+        }
+
+    }
+
+
+/////now both coupon and item available
+ 
+    ///if available
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+    const rentalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const total_price = rentalDays * price_per_day;
+    const totalWithDiscount=total_price-(total_price*discount/100);
+    const late_fee = 0;
+
+    const sql = `INSERT INTO rentals (item_id, renter_id, owner_id, start_date, end_date, total_price, late_fee, status, created_at) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    const rentalData = [
+      item_id,
+      renter_id,
+      owner_id,
+      start_date,
+      end_date,
+      totalWithDiscount,
+      late_fee,
+      "pending",
+      new Date(),
+    ];
+
+    db.query(sql, rentalData, (error, results) => {
+      if (error) {
+        console.error("Error request for rental:", error);
+        return res.status(500).json({
+          message: "Error request for rental",
+          error: error.message,
+        });
+      }
+
+      return res.status(201).json({
+        message: "Your request to rent this item sent successfully to its owner,please wait for his decision",
+        rentalId: results.insertId, // Return the inserted ID
+      });
+    });
+    const getUser = `SELECT first_name,last_name FROM users WHERE user_id = ?`;
+    const [userResult] = await db.promise().query(getUser, [renter_id]);
+    const firstName = userResult[0].first_name;
+    const lastName = userResult[0].last_name;
+
+    const notificationMessage= `${firstName} ${lastName}  requested to rent the item "${item_name}" from ${start_date} to ${end_date}`;
+    const status ="unread";
+
+    const sendNotification=`INSERT INTO notifications (user_id, message, status, created_at) VALUES (?, ?, ?, ?)`;
+    const notificationData = [owner_id, notificationMessage, status, new Date()];
+    await db.promise().query(sendNotification,notificationData);
+
+  } catch (error) {
+    console.error("Error request for rental:", error);
+    return res.status(500).json({
+      message: "Error request for rental",
+      error: error.message || "An error occurred",
+    });
+  }
+});
+const addRental = catchAsync (async(req, res,next) => {
+  try {
+    const { renter_id,item_id, start_date, end_date } = req.body;
+    // const token = req.headers.authorization.split(" ")[1];
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // const renter_id = decoded.id;
 
     const getItem = `SELECT owner_id, price_per_day, availability_status ,name as item_name  FROM item WHERE item_id = ?`;
     const [itemResult] = await db.promise().query(getItem, [item_id]);
@@ -98,9 +216,8 @@ const registerRental = async (req, res) => {
       error: error.message || "An error occurred",
     });
   }
-};
-
-const getAllRentals = async (req, res) => {
+});
+const getAllRentals = catchAsync(async (req, res) => {
   try {
     const token =
       req.headers.authorization &&
@@ -171,7 +288,7 @@ const getAllRentals = async (req, res) => {
       error: error.message || "An error occurred",
     });
   }
-};
+});
 
 const getRentals = async (req, res) => {
   try {
@@ -704,4 +821,5 @@ module.exports = {
   getRentals,
   updateRental,
   acceptOrDenyRental,
+  addRental
 };
