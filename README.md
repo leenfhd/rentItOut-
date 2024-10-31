@@ -46,7 +46,6 @@ This project is actively maintained and open for contributions. Check out the do
     <li><a href="#gs">Getting Started</a></li>
     <li><a href="#API">API Documentation</a></li>
     <li><a href="#demo">Demo</a></li>
-    <li><a href="#contribution">Contribution</a></li>
     <li><a href="#contact">Contact/a></li>
   </ol>
 </details>
@@ -190,7 +189,6 @@ The API is thoroughly documented using Postman. Access the full documentation by
 <p align="right"><a href="#home">⬆️ Top</a></p>
 <br>
 <br>
-
 <a name="demo"></a>
 ## 🎥 Demo
 
@@ -202,21 +200,6 @@ Feel free to explore the interface, features, and overall user experience. Your 
 
 <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
 
-
-<a name="contribution"></a>
-## 🤝 Contributors
-
-<p align="right"> <a href="https://github.com/leenfhd/rentItOut-/graphs/contributors"><img src="https://img.shields.io/github/contributors/leenfhd/rentItOut-" alt="contributors" /></a> </p>
-<p align="center"><a href="https://github.com/leenfhd/rentItOut-/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=leenfhd/rentItOut-" />
-  <img src="https://contrib.rocks/image?repo=marah3/rentItOut-" />
-  <img src="https://contrib.rocks/image?repo=MarahShakhshir/rentItOut-" />
-  <img src="https://contrib.rocks/image?repo=RaghadMM/rentItOut-" />
-  
-</a> </p>
-
-
-<p align="right"><a href="#readme-top">⬆️ top</a></p>
 
 <a name="contact"></a>
 ## 📫 Contact
