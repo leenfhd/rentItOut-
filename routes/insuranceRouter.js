@@ -6,7 +6,7 @@ authController = require("./../controllers/userAuth");
 // router.use(
 //   authController.allow("You must be renter to perform this.", "renter")
 // );
-
+router.use(authController.allow("You must be owner to perform this.", "owner"));
 router.post("/", insuranceController.insertInsurance);
 router.get("/search", insuranceController.searchInsurance);
 router.patch("/:id", insuranceController.updateInsurance);
