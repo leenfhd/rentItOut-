@@ -6,6 +6,11 @@ exports.getProfile = (req, res, next) => {
   next();
 };
 
+exports.getStaticProfile = (req, res, next) => {
+  req.params.id = 3;
+  next();
+};
+
 exports.search = catchAsync(async (req, res, next) => {
   const query = req.query;
 
