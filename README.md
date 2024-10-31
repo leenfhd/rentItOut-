@@ -190,6 +190,7 @@ The API is thoroughly documented using Postman. Access the full documentation by
 <br>
 <br>
 <a name="demo"></a>
+
 ## 🎥 Demo
 
 Check out our project demo to see RentItOut in action! Click the link below to experience the functionality and features firsthand:
