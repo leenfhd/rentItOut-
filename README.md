@@ -71,10 +71,11 @@ This project is actively maintained and open for contributions. Check out the do
   <a name="extrafeatures"></a> 
 ## ⚙️ Extra Features
 - **User Privacy and Data Security**: Secure user data with privacy measures like jwt and encryption for passwords.
-- **Role Management**: Different roles (e.g., renter, owner,both, admin) with specific permissions.
-- **External Api integration**: for getting current address of the user and another one for zego cloud  for virsual meetings.
-- **GUI Integreation**: Frontend demonstration by flutter for easy use.
-- **Chatting system**: Real Time chatting.
+- **Wishlists**:enables users to save items they’re interested in.
+- **External Api integration**: for getting current address of the user and another one for zego cloud  for virsual meetings(justfor front end),Strip payment Api.
+- **User Messaging System**:allows users to communicate within the platform, with fields for sender, receiver with front end added.
+- **Coupons and Discounts**: promotional codes with start and end dates for discount validity, allowing the platform to offer discounts to  active users.
+- **Notification System**: Enables renters to send rental requests to owners, who can then accept or deny the requests in real-time.
   <p align="right"><a href="#home">⬆️ Top</a></p>
 <br>
 
