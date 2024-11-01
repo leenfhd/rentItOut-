@@ -820,10 +820,10 @@ const updateLateFeesController = (req, res) => {
     const lateFees = calculateLateFees(end_date, returnDate, lateFeePerDay);
 
     // Update the late fee in the database
-    const updateQuery = "UPDATE rentals SET late_fee = ? WHERE rental_id = ?";
+    const updateQuery = "UPDATE rentals SET late_fee = ?, end_date =? WHERE rental_id = ?";
     db.query(
       updateQuery,
-      [lateFees.totalLateFee, rental_id],
+      [lateFees.totalLateFee,returnDate, rental_id],
       (updateErr, updateResults) => {
         if (updateErr) {
           console.error("Error updating late fees:", updateErr);
@@ -840,7 +840,7 @@ const updateLateFeesController = (req, res) => {
           message: "Late fees updated successfully",
           rental_id,
           lateFees,
-          updatedRental: { ...rental, late_fee: lateFees.totalLateFee },
+          updatedRental: { ...rental, late_fee: lateFees.totalLateFee,end_date: returnDate },
         });
       }
     );
