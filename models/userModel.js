@@ -4,19 +4,12 @@ const connection = require("../db_connections/dbConnect");
 require("dotenv").config();
 const apiKey = process.env.IPINFO_API_KEY;
 const User = {
-  async create({
-    first_name,
-    last_name,
-    email,
-    password,
-    phone_number,
-    rating,
-    role,
-  }) {
+  async create({ first_name, last_name, email, password, phone_number, role }) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Fetch location data from ipinfo.io API
     let address;
+    let rating = "1";
     try {
       const response = await axios.get("https://ipinfo.io/json", {
         headers: {
@@ -55,7 +48,45 @@ const User = {
     });
   },
 
-  // Other methods remain the same
+  async findByEmailandPassword(email, password) {
+    const sql = "SELECT * FROM users WHERE email = ?";
+    return new Promise((resolve, reject) => {
+      connection.query(sql, [email], async (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+
+        if (results.length === 0) {
+          return reject(new Error("User not found"));
+        }
+
+        const user = results[0];
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+          return reject(new Error("Incorrect password"));
+        }
+
+        resolve(user);
+      });
+    });
+  },
+
+  findById(userId) {
+    const sql = "SELECT * FROM users WHERE user_id = ?";
+    return new Promise((resolve, reject) => {
+      connection.query(sql, [userId], (err, results) => {
+        if (err) {
+          console.log(err);
+          return reject(err); // Reject the promise if there's an error
+        }
+        if (results.length === 0) {
+          return resolve(null); // If no user is found, return null
+        }
+        const user = results[0];
+        resolve(user); // Return the found user
+      });
+    });
+  },
 };
 
 module.exports = User;
