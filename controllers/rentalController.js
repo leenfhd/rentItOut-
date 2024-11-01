@@ -217,6 +217,7 @@ const addRental = catchAsync (async(req, res,next) => {
     });
   }
 });
+
 const getAllRentals = catchAsync(async (req, res) => {
   try {
     const token =
@@ -459,6 +460,77 @@ const getRentals = async (req, res) => {
     });
   }
 };
+const getLateRentals =catchAsync(async(req,res)=>{
+  try {
+    const token =
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+        ? req.headers.authorization.split(" ")[1]
+        : null;
+
+    
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "You are not authorized. Please log in." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const userRoleQuery = "SELECT role FROM users WHERE user_id = ?"; 
+
+    db.query(userRoleQuery, [userId], (error, results) => {
+      if (error) {
+        console.error("Error retrieving user role:", error);
+        return res.status(500).json({
+          message: "Error retrieving user role",
+          error: error.message,
+        });
+      }
+
+
+      if (results.length === 0) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+    });
+
+    const userRole=results[0].role;
+    if(userRole!=="owner"){
+      return res.status(403).json({
+        message: "You cant see late rentals, you are not an owner",
+      });
+    }
+
+    const getLate= `SELECT * FROM rentals
+    WHERE owner_id = ? AND status = 'ongoing' AND end_date < CURDATE()`;
+
+    db.query(getLate,[userId],(error,results)=>{
+      if (error) {
+        console.error("Error getting late rentals for owner:", error);
+        return res.status(500).json({
+          message: "Error getting late rentals",
+          error: error.message,
+        });
+      }
+      return res.status(200).json({
+        message: "Late rentals retrieved successfully for the owner",
+        rentals: results, // Return the list of late rentals
+      });
+    });
+
+
+  } catch (error) {
+    console.error("Error retreiving late rentals:", error);
+    return res.status(500).json({
+      message: "Error retreiving late rentals",
+      error: error.message || "An error occurred",
+    });
+  }
+}
+)
 const acceptOrDenyRental = async (req, res) => {
   try {
     const token =
