@@ -632,6 +632,21 @@ const acceptOrDenyRental = async (req, res) => {
 
 const updateRental = async (req, res) => {
   try {
+    const token =
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+        ? req.headers.authorization.split(" ")[1]
+        : null;
+
+    // If no token is provided, return unauthorized error
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "You are not authorized. Please log in." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
     const rental_id = req.params.id;
     const { status, total_price, start_date, end_date } = req.body;
 
@@ -642,6 +657,28 @@ const updateRental = async (req, res) => {
           "Please provide at least one field to update (status, price, start_date, end_date)",
       });
     }
+    const userRoleQuery = "SELECT role FROM users WHERE user_id = ?";
+    db.query(userRoleQuery, [userId], (roleError, roleResults) => {
+      if (roleError) {
+        console.error("Error retrieving user role:", roleError);
+        return res.status(500).json({
+          message: "Error retrieving user role",
+          error: roleError.message,
+        });
+      }
+
+      if (roleResults.length === 0) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+
+      const userRole = roleResults[0].role;
+      if (userRole !== "owner" && userRole !== "both") {
+        return res.status(403).json({
+          message: "You do not have permission to update this rental",
+        });
+      }
 
     // Start building the update query dynamically
     let updateFields = [];
@@ -719,6 +756,7 @@ const updateRental = async (req, res) => {
         });
       });
     });
+  });
   } catch (error) {
     console.error("Error updating rental:", error);
     return res.status(500).json({

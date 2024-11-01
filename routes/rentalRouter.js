@@ -11,7 +11,7 @@ router.get("/LateRentals", rentalController.getLateRentals);
 router.post("/Fees", rentalController.updateLateFeesController);
 router.delete("/:id", rentalController.deleteRental);
 
-router.put("/Rentals/:id", rentalController.updateRental);
+router.put("/:id", rentalController.updateRental);
 router.post('/decision', rentalController.acceptOrDenyRental);
 
 module.exports = router;
