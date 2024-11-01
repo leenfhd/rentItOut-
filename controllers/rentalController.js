@@ -495,18 +495,14 @@ const getLateRentals =catchAsync(async(req,res)=>{
           message: "User not found",
         });
       }
-    });
-
-    const userRole=results[0].role;
+      const userRole=results[0].role;
     if(userRole!=="owner"){
       return res.status(403).json({
         message: "You cant see late rentals, you are not an owner",
       });
     }
-
     const getLate= `SELECT * FROM rentals
     WHERE owner_id = ? AND status = 'ongoing' AND end_date < CURDATE()`;
-
     db.query(getLate,[userId],(error,results)=>{
       if (error) {
         console.error("Error getting late rentals for owner:", error);
@@ -521,6 +517,14 @@ const getLateRentals =catchAsync(async(req,res)=>{
       });
     });
 
+    });
+
+    
+
+    
+
+
+
 
   } catch (error) {
     console.error("Error retreiving late rentals:", error);
@@ -529,8 +533,7 @@ const getLateRentals =catchAsync(async(req,res)=>{
       error: error.message || "An error occurred",
     });
   }
-}
-)
+});
 const acceptOrDenyRental = async (req, res) => {
   try {
     const token =
@@ -893,5 +896,6 @@ module.exports = {
   getRentals,
   updateRental,
   acceptOrDenyRental,
-  addRental
+  addRental,
+  getLateRentals
 };
