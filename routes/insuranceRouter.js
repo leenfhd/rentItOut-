@@ -2,10 +2,7 @@ const express = require("express");
 const router = express.Router();
 insuranceController = require("./../controllers/insuranceController");
 authController = require("./../controllers/userAuth");
-// router.use(authController.loginConfirmation);
-// router.use(
-//   authController.allow("You must be renter to perform this.", "renter")
-// );
+router.use(authController.loginConfirmation);
 router.use(authController.allow("You must be owner to perform this.", "owner"));
 router.post("/", insuranceController.insertInsurance);
 router.get("/search", insuranceController.searchInsurance);
