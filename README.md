@@ -14,7 +14,6 @@
 ## 🏷️ Badges
 
 ![GitHub issues](https://img.shields.io/github/issues/leenfhd/rentItOut-)
-![GitHub contributors](https://img.shields.io/github/contributors/leenfhd/rentItOut-)
 ![GitHub last commit](https://img.shields.io/github/last-commit/leenfhd/rentItOut-)
 
 
@@ -84,27 +83,30 @@ This project is actively maintained and open for contributions. Check out the do
 
 The RentItOut platform has three primary user roles, each with specific permissions:
 
-### 1. User
-- **Overview**: Regular users who can browse and interact with the platform.
+### 1. Admin
+- **Overview**: The Admin role is responsible for overseeing platform operations and ensuring the smooth management of users, coupons, and rentals.
 - **Permissions**:
-  - Create and manage their own item listings.
-  - Search for and view items available for rent.
-  - Initiate rental transactions and communicate with renters.
+  - Admins can create, update, and delete coupons.
+  - Monitor rental activities,
+  - Manage user accounts.
 
-### 2. Renter
-- **Overview**: Users who specifically rent out items.
+### 2. Owner
+- **Overview**: Owners are users who list items for rent on the platform.
 - **Permissions**:
-  - List items for rent.
-  - Manage rental durations and pricing for their items.
-  - View rental history and receive feedback from users.
+  - Control over the items they rent out.
+  - Manage insurance options for those items.
+  - Owners can respond to rental requests and impose fees if renters return items late.
 
-### 3. Admin
-- **Overview**: Platform administrators responsible for overseeing operations.
+### 3. Renter
+- **Overview**: Renters are users who browse and rent items listed by owners.
 - **Permissions**:
-  - Manage user accounts (create, update, delete).
-  - Review and approve item listings.
-  - Monitor transactions and handle disputes.
-
+  - They can manage their deliveries.
+  - Leave reviews for both rentals and other users.
+  - Save items to their wishlist.
+    
+ ### 4. Owner-Renter
+   - **Overview**:This role is ideal for users who want to fully participate in the platform's ecosystem, both as providers and consumers of rental services.
+     
 This structure ensures a secure and efficient rental process for all users.
   <p align="right"><a href="#home">⬆️ Top</a></p>
 <br>
