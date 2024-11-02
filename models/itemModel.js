@@ -1,13 +1,13 @@
 const connection = require("../db_connections/dbConnect");
 
 const Item = {
-  // Create a new item
-  create({ name, description, price_per_day, availability_status, category_id, owner_id }) {
+  // Create a new item with image data
+  create({ name, description, price_per_day, availability_status, category_id, owner_id, image_url, image_data }) {
     const sql = `
-      INSERT INTO Item (name, description, price_per_day, availability_status, category_id, owner_id, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, NOW())
+      INSERT INTO Item (name, description, price_per_day, availability_status, category_id, owner_id, image_url, image_data, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
     `;
-    const values = [name, description, price_per_day, availability_status, category_id, owner_id];
+    const values = [name, description, price_per_day, availability_status, category_id, owner_id, image_url, image_data];
 
     return new Promise((resolve, reject) => {
       connection.query(sql, values, (err, results) => {
@@ -29,7 +29,7 @@ const Item = {
     });
   },
 
-  // Update item by ID
+  // Update item by ID, including image_url or image_data
   updateById(itemId, data) {
     const sql = "UPDATE Item SET ? WHERE item_id = ?";
     return new Promise((resolve, reject) => {
@@ -61,8 +61,10 @@ const Item = {
       });
     });
   },
+
+  // Search items with filters
   search({ name, category_id, minPrice, maxPrice, availability }) {
-    let sql = `SELECT * FROM item WHERE 1=1`; // 1=1 is a simple way to start a dynamic query
+    let sql = `SELECT * FROM Item WHERE 1=1`; // 1=1 is a simple way to start a dynamic query
 
     const values = [];
 
@@ -99,8 +101,6 @@ const Item = {
       });
     });
   }
-
-
 };
 
 module.exports = Item;
