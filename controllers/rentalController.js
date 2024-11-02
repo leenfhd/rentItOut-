@@ -6,10 +6,28 @@ const catchAsync = require("../utils/catchAsync");
 // Controller function to register rental
 const registerRental = catchAsync (async(req, res,next) => {
   try {
+
     const { item_id, start_date, end_date,code } = req.body;
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const renter_id = decoded.id;
+    const userRoleQuery = "SELECT role FROM users WHERE user_id = ?";
+    const [userResults] = await db.promise().query(userRoleQuery, [renter_id]);
+
+    if (userResults.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userRole = userResults[0].role; 
+    console.log("role:" ,userRole);
+
+
+    if (userRole !== "renter" && userRole !== "both") {
+        return res.status(403).json({
+          message: "You are not a renter. You can't ask for renting.",
+        });
+      }
+  
 
     const getItem = `SELECT owner_id, price_per_day, availability_status ,name as item_name  FROM item WHERE item_id = ?`;
     const [itemResult] = await db.promise().query(getItem, [item_id]);
@@ -82,102 +100,6 @@ const registerRental = catchAsync (async(req, res,next) => {
       start_date,
       end_date,
       totalWithDiscount,
-      late_fee,
-      "pending",
-      new Date(),
-    ];
-
-    db.query(sql, rentalData, (error, results) => {
-      if (error) {
-        console.error("Error request for rental:", error);
-        return res.status(500).json({
-          message: "Error request for rental",
-          error: error.message,
-        });
-      }
-
-      return res.status(201).json({
-        message: "Your request to rent this item sent successfully to its owner,please wait for his decision",
-        rentalId: results.insertId, // Return the inserted ID
-      });
-    });
-    const getUser = `SELECT first_name,last_name FROM users WHERE user_id = ?`;
-    const [userResult] = await db.promise().query(getUser, [renter_id]);
-    const firstName = userResult[0].first_name;
-    const lastName = userResult[0].last_name;
-
-    const notificationMessage= `${firstName} ${lastName}  requested to rent the item "${item_name}" from ${start_date} to ${end_date}`;
-    const status ="unread";
-
-    const sendNotification=`INSERT INTO notifications (user_id, message, status, created_at) VALUES (?, ?, ?, ?)`;
-    const notificationData = [owner_id, notificationMessage, status, new Date()];
-    await db.promise().query(sendNotification,notificationData);
-
-  } catch (error) {
-    console.error("Error request for rental:", error);
-    return res.status(500).json({
-      message: "Error request for rental",
-      error: error.message || "An error occurred",
-    });
-  }
-});
-const addRental = catchAsync (async(req, res,next) => {
-  try {
-    const { renter_id,item_id, start_date, end_date } = req.body;
-    // const token = req.headers.authorization.split(" ")[1];
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // const renter_id = decoded.id;
-
-    const getItem = `SELECT owner_id, price_per_day, availability_status ,name as item_name  FROM item WHERE item_id = ?`;
-    const [itemResult] = await db.promise().query(getItem, [item_id]);
-    if (itemResult.length === 0) {
-      return res.status(404).json({ message: "Item not found" });
-    }
-
-    const owner_id = itemResult[0].owner_id;
-    const price_per_day = itemResult[0].price_per_day;
-    const availability_status = itemResult[0].availability_status;
-    const item_name=itemResult[0].item_name;
-
-
-    //Check for availability of the item
-    if(availability_status !="available"){
-      const itemRentingHistory = `SELECT end_date FROM rentals Where item_id=? and status='ongoing' ORDER BY end_date DESC LIMIT 1`;
-
-      const [itemHistory]=await db.promise().query(itemRentingHistory,[item_id]);
-      if(itemHistory .length>0){//there is a previous rental for this item
-        const previousRentalEndDate= new Date(itemHistory[0].end_date);
-        const requestStartDate= new Date(start_date);
-
-        if(previousRentalEndDate >= requestStartDate){//unavailable
-          return res.status(400).json({
-            message:"Item is already rented on the requested days"
-          });
-        }
-        }else{
-          return res.status(400).json({
-            message: "Item is currently unavailable for new rentals.",
-          });
-        }
-
-    }
-    ///if available
-    const startDate = new Date(start_date);
-    const endDate = new Date(end_date);
-    const rentalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-    const total_price = rentalDays * price_per_day;
-    const late_fee = 0;
-
-    const sql = `INSERT INTO rentals (item_id, renter_id, owner_id, start_date, end_date, total_price, late_fee, status, created_at) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-    const rentalData = [
-      item_id,
-      renter_id,
-      owner_id,
-      start_date,
-      end_date,
-      total_price,
       late_fee,
       "pending",
       new Date(),
@@ -496,7 +418,7 @@ const getLateRentals =catchAsync(async(req,res)=>{
         });
       }
       const userRole=results[0].role;
-    if(userRole!=="owner"){
+    if(userRole!=="owner" && userRole!="both"){
       return res.status(403).json({
         message: "You cant see late rentals, you are not an owner",
       });
@@ -519,13 +441,6 @@ const getLateRentals =catchAsync(async(req,res)=>{
 
     });
 
-    
-
-    
-
-
-
-
   } catch (error) {
     console.error("Error retreiving late rentals:", error);
     return res.status(500).json({
@@ -534,6 +449,7 @@ const getLateRentals =catchAsync(async(req,res)=>{
     });
   }
 });
+
 const acceptOrDenyRental = async (req, res) => {
   try {
     const token =
@@ -934,6 +850,5 @@ module.exports = {
   getRentals,
   updateRental,
   acceptOrDenyRental,
-  addRental,
   getLateRentals
 };
