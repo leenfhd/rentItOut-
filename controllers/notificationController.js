@@ -1,4 +1,4 @@
-const Notification = require("../models/notificationModel"); // Adjust the path as necessary
+const Notification = require("../models/notificationModel"); 
 const db = require("../db_connections/dbConnect");
 const jwt = require("jsonwebtoken");
 
@@ -22,7 +22,7 @@ const createNotification = async (req, res) => {
 
       return res.status(201).json({
         message: "Notification registered successfully",
-        notificationlId: results.insertId, // Return the inserted ID
+        notificationlId: results.insertId, 
       });
     });
   } catch (error) {
@@ -33,6 +33,8 @@ const createNotification = async (req, res) => {
     });
   }
 };
+
+//get the notifications for the registered user
 const getUserNotifications = async (req, res) => {
   try {
     const token =
@@ -41,7 +43,7 @@ const getUserNotifications = async (req, res) => {
         ? req.headers.authorization.split(" ")[1]
         : null;
 
-    // If no token is provided, return unauthorized error
+
     if (!token) {
       return res
         .status(401)
@@ -70,7 +72,7 @@ const getUserNotifications = async (req, res) => {
 
       return res.status(200).json({
         message: "Notifications retrieved successfully",
-        rental: results, // Return the list of rentals
+        Notification: results, 
       });
     });
   } catch (error) {
@@ -89,7 +91,7 @@ const markAsRead = async (req, res) => {
         ? req.headers.authorization.split(" ")[1]
         : null;
 
-    // If no token is provided, return unauthorized error
+  
     if (!token) {
       return res
         .status(401)
@@ -147,10 +149,10 @@ const markAsRead = async (req, res) => {
             });
           }
 
-          // Send back the updated rental data
+
           return res.status(200).json({
             message: "Notification status updated successfully",
-            updatedNotification: notificationResults[0], // Send the first and only result
+            updatedNotification: notificationResults[0], 
           });
         }
       );
@@ -179,7 +181,7 @@ const deleteNotification = async (req, res) => {
       ? req.headers.authorization.split(" ")[1]
       : null;
 
-  // If no token is provided, return unauthorized error
+
   if (!token) {
     return res
       .status(401)
@@ -221,7 +223,7 @@ const deleteNotification = async (req, res) => {
 
       return res.status(200).json({
         message: "Notification deleted successfully",
-        // rental: results // Return the list of rentals
+
       });
     });
   } catch (error) {
