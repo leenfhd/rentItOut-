@@ -8,15 +8,16 @@ app.listen(PORT, () => console.log(`running on http://localhost:${PORT}`)); // t
 
 const connection = require("./db_connections/dbConnect");
 
-const MessageRoute=require('./Routes/messageRoutes.js');
 const rentalRoutes=require('./Routes/rentalRoutes.js');
 const userRoutes=require('./Routes/userRoutes.js');
 const ReviewRoutes=require('./Routes/reviewRoutes.js');
+const MessageRoute=require('./Routes/messageRoutes.js');
 
-app.use(MessageRoute);
+
+app.use("/message/",MessageRoute);
+app.use("/review/",ReviewRoutes);
 app.use(rentalRoutes);
 app.use(userRoutes);
-app.use(ReviewRoutes);
 
 // app.use('/api', reviewRoutes); // Adjust the base path as needed
 

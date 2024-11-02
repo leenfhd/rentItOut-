@@ -15,7 +15,7 @@ const Message = {
       const message_id = Math.floor(Math.random() * 1000000); // Generate a random ID
 
       const sql = `
-        INSERT INTO Message (message_id, sender_id, receiver_id, rental_id, content, createed_at, messageType, imageURL)
+        INSERT INTO Message (message_id, sender_id, receiver_id, rental_id, content, created_at, messageType, imageURL)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
@@ -94,7 +94,7 @@ const Message = {
         JOIN Users u ON m.sender_id = u.user_id
         WHERE (m.sender_id = ? AND m.receiver_id = ?)
            OR (m.sender_id = ? AND m.receiver_id = ?)
-        ORDER BY m.createed_at ASC
+        ORDER BY m.created_at ASC
       `;
 
       connection.query(
@@ -144,21 +144,18 @@ const Message = {
   },
 
 
-  deleteReview(message_id) {
+  deleteMessage: (message_id) => {
     return new Promise((resolve, reject) => {
-      const query = `DELETE FROM Review WHERE review_id = ?`;
-
-      connection.query(query, [review_id], (err, result) => {
+      const query = `DELETE FROM Message WHERE message_id = ?`;
+      connection.query(query, [message_id], (err, result) => {
         if (err) {
-          console.error("Database query error:", err);
-          return reject(err); // Reject the promise on error
+          console.error("Error executing delete query:", err);
+          return reject(err);
         }
-
-        resolve(result); // Resolve the promise with the result
+        resolve(result);
       });
     });
   },
-
 
 
 

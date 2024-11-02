@@ -1,13 +1,8 @@
 const { request } = require('express');
 const Message = require('../models/messageSchema.js');
-const ErrorResponse = require('../utils/errorResponse.js');
-const bcrypt = require('bcrypt');
-var dt=require('../date.js');
 const multer = require("multer");
 const Review =require('../models/reviewSchema.js');
-const jwt = require('jsonwebtoken');
-const connection = require('../db_connections/dbConnect.js');
-
+ 
 
 // Configure multer for handling file uploads
 const storage = multer.diskStorage({
@@ -24,54 +19,32 @@ const upload = multer({ storage: storage });
 
 
 
-
-
-
-
-
-exports.viewUserOFItem = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-
-    const result = await Message.getUserDetailsOfItem(id);
-
-    if (result && result.length > 0) {
-      res.status(200).json(result);
-    } else {
-      res.status(404).json({ message: "No user data found for the given rental ID" });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
-};
-
-
-
-
-
-
-
-
 exports.addUserReview = async (req, res, next) => {
   try {
-    const { rental_id, reviewer_id, reviewer_user_id, rating, comment } = req.body;
+      const {   reviewer_id, reviewer_user_id, rating, comment } = req.body;
+     
+console.log(  reviewer_id);
+console.log(  reviewer_user_id);
+console.log(  rating);
 
-    
-    if (!rental_id || !reviewer_id || !reviewer_user_id || !rating) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-    
-    const result = await Review.addUserReview({ rental_id, reviewer_id, reviewer_user_id, rating, comment });
+console.log(  comment);
 
-    res.status(200).json({ message: 'Review added successfully', reviewId: result.insertId });
+
+      if (  !reviewer_id || !reviewer_user_id || !rating) {
+          return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const result = await Review.addUserReview({ reviewer_id, reviewer_user_id, rating, comment });
+
+      res.status(200).json({ message: 'Review added successfully', reviewId: result.insertId });
   } catch (error) {
-    console.error('Error adding user review:', error);     res.status(500).json({ error: error.message || 'Internal Server Error' });
+      console.error('Error adding user review:', error);
+      res.status(500).json({ error: error.message || 'Internal Server Error' });
   }
 };
 
 
-
+ 
 
 
 
@@ -80,6 +53,7 @@ exports.addUserReview = async (req, res, next) => {
 exports.addRentalReview = async (req, res, next) => {
   try {
     const { rental_id, reviewer_id, rating, comment } = req.body;
+
     if (!rental_id || !reviewer_id || !rating) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -87,11 +61,15 @@ exports.addRentalReview = async (req, res, next) => {
 
     res.status(200).json({ message: 'Rental review added successfully', reviewId: result.insertId });
   } catch (error) {
-    console.error('Error adding rental review:', error); 
-        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    console.error('Error adding rental review:', error);
+
+    if (error.message === 'You cannot review this rental because you have not rented it.') {
+      return res.status(403).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message || 'Internal Server Error' });
   }
 };
- 
+
 
 
 
@@ -143,22 +121,23 @@ exports.viewUserReviews = async (req, res, next) => {
 
 
 
-
-
 exports.editReview = async (req, res, next) => {
   try {
-    const {review_id}=req.params;
-    const {  rental_id, reviewer_id, reviewer_user_id, rating, comment } = req.body;
+    // Extract review_id and reviewer_id from URL params
+    const { review_id, reviewer_id } = req.params;
+    const { rental_id, reviewer_user_id, rating, comment } = req.body;
 
-    const result = await Review.editReview({ review_id, rental_id, reviewer_id, reviewer_user_id, rating, comment });
+    // Call editReview method with necessary details
+    const result = await Review.editReview({ review_id, reviewer_id, rental_id, reviewer_user_id, rating, comment });
+
     res.status(200).json(result);
-
   } catch (error) {
+    if (error.message === 'Unauthorized') {
+      return res.status(403).json({ error: 'You are not authorized to edit this review.' });
+    }
     res.status(400).json({ error: error.message });
   }
 };
-
-
 
 
 
@@ -166,20 +145,20 @@ exports.editReview = async (req, res, next) => {
 
 exports.deleteReviews = async (req, res, next) => {
   try {
-    
-    const {review_id}=req.params;
+    const { review_id } = req.params;
+    const { reviewer_id } = req.body; // Assuming `reviewer_id` is sent in the request body
 
-    console.log(review_id);
-
-    const result = await Review.deleteReview(review_id);
+    const result = await Review.deleteReview(review_id, reviewer_id);
     res.status(200).json(result);
 
   } catch (error) {
+    if (error.message === "Unauthorized") {
+      return res.status(403).json({ error: "You are not authorized to delete this review." });
+    }
     console.error("Error deleting review:", error);
     res.status(400).json({ error: error.message });
   }
 };
-
 
 
 
@@ -206,3 +185,50 @@ exports.searchReview = async (req, res, next) => {
 
  
  
+
+exports.checkAndSendCoupon = async (req, res) => {
+  const { user_id } = req.params; // Assume user_id is passed in the URL
+
+  try {
+    // Step 1: Get the average rating for the user
+    const userAverageRating = await Review.getUserAverageRating(user_id);
+
+    if (userAverageRating >= 4) {
+      // Step 2: Get the owner's average rating
+      const ownerAverageRating = await Review.getOwnerAverageRating(user_id);
+
+      if (ownerAverageRating >= 4) {
+        // Step 3: Get a coupon
+        const coupon = await Review.getCoupon();
+
+        // Step 4: Send a message
+        await Review.sendMessage('rentitout@gmail.com', user_id, `Congratulations! Here is your coupon code: ${coupon.code}`);
+
+        return res.status(200).json({ message: 'Coupon sent successfully!', coupon: coupon.code });
+      }
+    }
+
+    res.status(400).json({ message: 'Conditions not met for sending a coupon.' });
+  } catch (error) {
+    console.error('Error checking ratings and sending coupon:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+exports.updateUserRatings = async (req, res) => {
+  try {
+    // Step 1: Get all users
+    const users = await Review.getAllUsers();
+
+    // Step 2: For each user, calculate their average rating and update it
+    for (const user of users) {
+      const averageRating = await Review.getUserAverageRating(user.user_id);
+      await Review.updateUserAverageRating(user.user_id, averageRating);
+    }
+
+    res.status(200).json({ message: 'User ratings updated successfully.' });
+  } catch (error) {
+    console.error('Error updating user ratings:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

@@ -11,24 +11,24 @@ const {
   viewUserReviews,
   editReview ,
   deleteReviews,
-  searchReview
+  searchReview,
+  checkAndSendCoupon,
+  updateUserRatings 
 }= require('../controllers/reviewController');
-
-
-
 
 
   router.post("/newUserReview", addUserReview);
   router.post("/newRentalReview", addRentalReview);
   router.get("/RentalReview/:rental_id", viewRentalReview);
   router.get("/UserReviews/:Userid", viewUserReviews);
-  router.put("/Review/Info/:review_id", editReview );
-  // router.put('/editRentalReviews', editRentalReviews);
-  router.post("/Review/:review_id", deleteReviews);
-  router.get("/Review/data/:name", searchReview);
+  router.put("/Info/:review_id/:reviewer_id", editReview );
+  router.delete("/Review/:review_id", deleteReviews);
+  router.get("/data/:name", searchReview);
 
+//for coupon
+  router.get('/send-coupon/:user_id', checkAndSendCoupon);
 
-
+  router.put('/update-user-ratings', updateUserRatings);
  
 
 

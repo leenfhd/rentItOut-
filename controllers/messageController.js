@@ -1,16 +1,8 @@
 const { request } = require('express');
-// const Message = require('../models/messageSchema.js');
-// const User =require('../models/userSchema.js');
-const ErrorResponse = require('../utils/errorResponse.js');
-const bcrypt = require('bcrypt');
-var dt=require('../date.js');
 const multer = require("multer");
-// const session = require('express-session');
 const Message=require('../models/messageSchema.js');
-
 const jwt = require('jsonwebtoken');
-const connection = require('../db_connections/dbConnect.js');
-
+ 
 
 // Configure multer for handling file uploads
 const storage = multer.diskStorage({
@@ -116,20 +108,20 @@ exports.fetchMsg = async (req, res, next) => {
   }
 };
 
-exports.viewAdmin = async (req, res, next) => {
-  try {
-    // Call the model function to fetch admins
-    const admins = await Message.getAdmins();
+// exports.viewAdmin = async (req, res, next) => {
+//   try {
+//     // Call the model function to fetch admins
+//     const admins = await Message.getAdmins();
 
-    res.status(200).json({
-      success: true,
-      admins, // returning the result as "admins"
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       admins, // returning the result as "admins"
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
 
  
@@ -155,10 +147,12 @@ exports.deleteMessages = async (req, res, next) => {
   try {
     const { message_id } = req.body;
 
-    // Call the model function to delete the message
+    if (!message_id) {
+      return res.status(400).json({ error: "Message ID is required" });
+    }
+
     const result = await Message.deleteMessage(message_id);
 
-    // Check the result and respond accordingly
     if (result.affectedRows > 0) {
       res.json({ message: "Message deleted successfully", affectedRows: result.affectedRows });
     } else {
@@ -172,3 +166,5 @@ exports.deleteMessages = async (req, res, next) => {
 
  
  
+
+

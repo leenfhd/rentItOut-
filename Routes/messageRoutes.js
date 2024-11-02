@@ -31,11 +31,8 @@ router.get('/AllUser', viewAllUser);
 router.get("/messages/:senderId/:recepientId", fetchMsg);
  
  // /api/deleteMessages acoording mesdage_id     -----Done
-  router.post("/Messages", deleteMessages);
+  router.delete("/Messages", deleteMessages);
 
- 
- // /api/viewAdmin
-  // router.get("/admin", viewAdmin);
 
 
 module.exports = router;
