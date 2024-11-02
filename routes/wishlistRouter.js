@@ -6,10 +6,13 @@ const router = express.Router();
 // Add an item to the wishlist
 router.post("/", async (req, res) => {
   const { user_id, item_id } = req.body;
+  console.log(`Received request to add item: user_id=${user_id}, item_id=${item_id}`);
+
   try {
     const wishlistId = await Wishlist.add({ user_id, item_id });
     res.status(201).json({ status: "success", wishlistId });
   } catch (error) {
+    console.error('Error adding to wishlist:', error);
     res.status(500).json({ status: "error", message: error.message });
   }
 });
