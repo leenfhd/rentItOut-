@@ -115,7 +115,7 @@ const registerRental = catchAsync (async(req, res,next) => {
       }
 
       return res.status(201).json({
-        message: "Your request to rent this item sent successfully to its owner,please wait for his decision",
+        message: "Your request to rent this item sent successfully to its owner,please wait for his approve",
         rentalId: results.insertId, 
       });
     });
