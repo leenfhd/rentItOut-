@@ -1,9 +1,10 @@
-const Rental = require("../models/rentalModel"); // Adjust the path as necessary
+const Rental = require("../models/rentalModel"); 
 const db = require("../db_connections/dbConnect");
 const jwt = require("jsonwebtoken");
 const { message } = require("../models/notificationModel");
 const catchAsync = require("../utils/catchAsync");
-// Controller function to register rental
+
+//new rental request
 const registerRental = catchAsync (async(req, res,next) => {
   try {
 
@@ -21,7 +22,7 @@ const registerRental = catchAsync (async(req, res,next) => {
     const userRole = userResults[0].role; 
     console.log("role:" ,userRole);
 
-
+    //just renter can rent
     if (userRole !== "renter" && userRole !== "both") {
         return res.status(403).json({
           message: "You are not a renter. You can't ask for renting.",
@@ -51,7 +52,7 @@ const registerRental = catchAsync (async(req, res,next) => {
     const currentDate=new Date();
 
 
-        ///check for coupon
+    ///check for coupon
     if(currentDate<valid_from && currentDate>valid_until){//unavailable
           return res.status(400).json({
             message:"The coupon in not valid for thr current date"
@@ -82,7 +83,6 @@ const registerRental = catchAsync (async(req, res,next) => {
 
 /////now both coupon and item available
  
-    ///if available
     const startDate = new Date(start_date);
     const endDate = new Date(end_date);
     const rentalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
@@ -116,7 +116,7 @@ const registerRental = catchAsync (async(req, res,next) => {
 
       return res.status(201).json({
         message: "Your request to rent this item sent successfully to its owner,please wait for his decision",
-        rentalId: results.insertId, // Return the inserted ID
+        rentalId: results.insertId, 
       });
     });
     const getUser = `SELECT first_name,last_name FROM users WHERE user_id = ?`;
@@ -148,7 +148,7 @@ const getAllRentals = catchAsync(async (req, res) => {
         ? req.headers.authorization.split(" ")[1]
         : null;
 
-    // If no token is provided, return unauthorized error
+    //check token + get current user
     if (!token) {
       return res
         .status(401)
@@ -158,7 +158,7 @@ const getAllRentals = catchAsync(async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
 
-    const userRoleQuery = "SELECT role FROM users WHERE user_id = ?"; // Adjust table name and field as necessary
+    const userRoleQuery = "SELECT role FROM users WHERE user_id = ?"; 
 
     db.query(userRoleQuery, [userId], (error, results) => {
       if (error) {
@@ -169,24 +169,24 @@ const getAllRentals = catchAsync(async (req, res) => {
         });
       }
 
-      // Check if user role is found
+
       if (results.length === 0) {
         return res.status(404).json({
           message: "User not found",
         });
       }
 
-      const userRole = results[0].role; // Get the role from the query result
+      const userRole = results[0].role; 
       console.log("role:" ,userRole);
 
-      // Check if the user is an admin
+     //specific for admin
       if (userRole !== "admin") {
         return res.status(403).json({
           message: "You are not an admin. You can't see all rentals.",
         });
       }
 
-      // If the user is an admin, proceed to get all rentals
+
       const sql = `SELECT * FROM rentals`;
 
       db.query(sql, (error, results) => {
@@ -200,7 +200,7 @@ const getAllRentals = catchAsync(async (req, res) => {
 
         return res.status(200).json({
           message: "Rentals retrieved successfully",
-          rentals: results, // Return the list of rentals
+          rentals: results, 
         });
       });
     });
@@ -221,7 +221,7 @@ const getRentals = async (req, res) => {
         ? req.headers.authorization.split(" ")[1]
         : null;
 
-    // If no token is provided, return unauthorized error
+
     if (!token) {
       return res
         .status(401)
@@ -242,7 +242,7 @@ const getRentals = async (req, res) => {
 
     const role = user[0].role;
 
-    const { rental_id, renter_id, owner_id, item_id, status } = req.query; // Expect query parameters
+    const { rental_id, renter_id, owner_id, item_id, status } = req.query; 
 
     let sql = "SELECT * FROM rentals WHERE 1 = 1";
     const queryParams = [];
@@ -400,6 +400,7 @@ const getLateRentals =catchAsync(async(req,res)=>{
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
 
+    //just for owner
     const userRoleQuery = "SELECT role FROM users WHERE user_id = ?"; 
 
     db.query(userRoleQuery, [userId], (error, results) => {
@@ -435,7 +436,7 @@ const getLateRentals =catchAsync(async(req,res)=>{
       }
       return res.status(200).json({
         message: "Late rentals retrieved successfully for the owner",
-        rentals: results, // Return the list of late rentals
+        rentals: results, 
       });
     });
 
@@ -450,6 +451,7 @@ const getLateRentals =catchAsync(async(req,res)=>{
   }
 });
 
+//response to pending requests
 const acceptOrDenyRental = async (req, res) => {
   try {
     const token =
@@ -458,7 +460,7 @@ const acceptOrDenyRental = async (req, res) => {
         ? req.headers.authorization.split(" ")[1]
         : null;
 
-    // If no token is provided, return unauthorized error
+
     if (!token) {
       return res
         .status(401)
@@ -468,8 +470,8 @@ const acceptOrDenyRental = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
 
-    // Get rental ID and action from request body
-    const { rental_id, action } = req.body; // Expecting action to be 'accept' or 'deny'
+   
+    const { rental_id, action } = req.body; 
 
     if (!rental_id || !action) {
       return res
@@ -477,7 +479,6 @@ const acceptOrDenyRental = async (req, res) => {
         .json({ message: "Please provide both rental_id and action." });
     }
 
-    // Check if the rental exists and if the user is the owner
     const [rental] = await db
       .promise()
       .query(
@@ -491,7 +492,7 @@ const acceptOrDenyRental = async (req, res) => {
         .json({ message: "Rental not found or you are not the owner." });
     }
 
-    // Update the rental status based on the action
+
     const item_id=rental[0].item_id;
     const renter_id=rental[0].renter_id;
 
@@ -502,7 +503,7 @@ const acceptOrDenyRental = async (req, res) => {
       notificationMessage= `Your request to rent item ${item_id} has been accepted`;
 
 
-      //update the availability of the item 
+  
       await db.promise().query("UPDATE item SET availability_status = 'unavailable' WHERE item_id=?", [item_id]);
 
     } else if (action === "deny") {
@@ -554,7 +555,7 @@ const updateRental = async (req, res) => {
         ? req.headers.authorization.split(" ")[1]
         : null;
 
-    // If no token is provided, return unauthorized error
+
     if (!token) {
       return res
         .status(401)
@@ -566,7 +567,7 @@ const updateRental = async (req, res) => {
     const rental_id = req.params.id;
     const { status, total_price, start_date, end_date } = req.body;
 
-    // Check if at least one field is provided for updating
+
     if (!status && !total_price && !start_date && !end_date) {
       return res.status(400).json({
         message:
@@ -596,23 +597,23 @@ const updateRental = async (req, res) => {
         });
       }
 
-    // Start building the update query dynamically
+
     let updateFields = [];
     let values = [];
 
-    // Add status to the update if it's provided
+   
     if (status) {
       updateFields.push("status = ?");
       values.push(status);
     }
 
-    // Add total_price to the update if it's provided
+ 
     if (total_price) {
       updateFields.push("total_price = ?");
       values.push(total_price);
     }
 
-    // Validate and add start_date and end_date to the update if provided
+  
     if (start_date) {
       updateFields.push("start_date = ?");
       values.push(start_date);
@@ -622,7 +623,7 @@ const updateRental = async (req, res) => {
       values.push(end_date);
     }
 
-    // Ensure that start_date is before end_date (if both are provided)
+    //check for start date is before end date
     if (start_date && end_date) {
       const startDateObj = new Date(start_date);
       const endDateObj = new Date(end_date);
@@ -633,13 +634,13 @@ const updateRental = async (req, res) => {
       }
     }
 
-    // Build the SQL query dynamically
+   
     const updateSql = `UPDATE rentals SET ${updateFields.join(
       ", "
     )} WHERE rental_id = ?`;
-    values.push(rental_id); // Append rental ID as the last value
+    values.push(rental_id); 
 
-    // Execute the update query
+
     db.query(updateSql, values, (error, results) => {
       if (error) {
         console.error("Error updating rental:", error);
@@ -655,7 +656,6 @@ const updateRental = async (req, res) => {
         });
       }
 
-      // Fetch the updated rental details to return
       const selectSql = "SELECT * FROM rentals WHERE rental_id = ?";
       db.query(selectSql, [rental_id], (selectError, rentalResults) => {
         if (selectError) {
@@ -682,6 +682,7 @@ const updateRental = async (req, res) => {
   }
 };
 
+//add fees for late rentals
 const updateLateFeesController = (req, res) => {
   const { rental_id, returnDate, lateFeePerDay } = req.body;
 
@@ -732,10 +733,8 @@ const updateLateFeesController = (req, res) => {
 
     }
 
-    // Calculate the late fees based on the returnDate and endDate
-    const lateFees = calculateLateFees(end_date, returnDate, lateFeePerDay);
-
-    // Update the late fee in the database
+  
+const lateFees = calculateLateFees(end_date, returnDate, lateFeePerDay);
     const updateQuery = "UPDATE rentals SET late_fee = ?, end_date =? WHERE rental_id = ?";
     db.query(
       updateQuery,
@@ -751,7 +750,6 @@ const updateLateFeesController = (req, res) => {
             });
         }
 
-        // Return the updated rental details
         return res.status(200).json({
           message: "Late fees updated successfully",
           rental_id,
@@ -763,12 +761,11 @@ const updateLateFeesController = (req, res) => {
   });
 };
 
-// Late fee calculation logic
+
 const calculateLateFees = (endDate, returnDate, lateFeePerDay) => {
   const end = new Date(endDate);
   const returned = new Date(returnDate);
 
-  // Calculate the number of late days
   const lateDays =
     returned > end ? Math.ceil((returned - end) / (1000 * 60 * 60 * 24)) : 0;
   const totalLateFee = lateDays * lateFeePerDay;
@@ -778,6 +775,7 @@ const calculateLateFees = (endDate, returnDate, lateFeePerDay) => {
     totalLateFee,
   };
 };
+
 const deleteRental = async (req, res) => {
   try {
     const rentalId = req.params.id;
@@ -830,7 +828,7 @@ const deleteRental = async (req, res) => {
 
       return res.status(200).json({
         message: "Rental deleted successfully",
-        // rental: results // Return the list of rentals
+
       });
     });
   } catch (error) {
