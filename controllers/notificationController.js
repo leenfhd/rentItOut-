@@ -4,6 +4,21 @@ const jwt = require("jsonwebtoken");
 
 const createNotification = async (req, res) => {
   try {
+    const token =
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+        ? req.headers.authorization.split(" ")[1]
+        : null;
+
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "You are not authorized. Please log in." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
     const { user_id, message, status } = req.body;
 
     const sql = `INSERT INTO notifications (user_id, message, status, created_at) 
