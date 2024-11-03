@@ -2,12 +2,11 @@
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Use your secret key from environment variables
 
-// Function to create a payment intent
+
 exports.createPaymentIntent = async (req, res) => {
     try {
         const { amount, currency } = req.body; // Expecting amount and currency in the request body
 
-        // Create a payment intent with the amount and currency
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency,
