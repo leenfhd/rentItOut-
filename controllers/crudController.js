@@ -222,10 +222,9 @@ exports.findAndUpdate = async (table, id, updateData) => {
     throw new Error("Update data must be a non-null object.");
   }
 
-  // Step 1: Find the record using findOneByParam (assuming it's for a single field, or adapt for multiple)
   const keys = Object.keys(id);
-  const param = keys[0]; // Get the first key from the find query
-  const value = id[param]; // Get the value for the param
+  const param = keys[0];
+  const value = id[param];
 
   const foundRecord = await exports.findOneByParam(table, param, value);
 
