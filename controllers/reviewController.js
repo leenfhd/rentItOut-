@@ -4,13 +4,13 @@ const multer = require("multer");
 const Review =require('../models/reviewSchema.js');
  
 
-// Configure multer for handling file uploads
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "files/"); // Specify the desired destination folder
+    cb(null, "files/"); 
   },
   filename: function (req, file, cb) {
-    // Generate a unique filename for the uploaded file
+  
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + "-" + file.originalname);
   },
@@ -26,7 +26,6 @@ exports.addUserReview = async (req, res, next) => {
 console.log(  reviewer_id);
 console.log(  reviewer_user_id);
 console.log(  rating);
-
 console.log(  comment);
 
 

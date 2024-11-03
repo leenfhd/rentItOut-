@@ -22,10 +22,10 @@ const upload = multer({ storage: storage });
 
 exports.viewUserOFItem = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { itemId } = req.params;
 
     // Call the model function to fetch user data
-    const result = await Message.getUserDetailsOfItem(id);
+    const result = await Message.getUserDetailsOfItem(itemId);
 
     if (result && result.length > 0) {
       res.status(200).json(result);
@@ -145,7 +145,7 @@ exports.viewAllUser = async (req, res, next) => {
 
 exports.deleteMessages = async (req, res, next) => {
   try {
-    const { message_id } = req.body;
+    const { message_id } = req.params;
 
     if (!message_id) {
       return res.status(400).json({ error: "Message ID is required" });

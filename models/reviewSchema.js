@@ -9,14 +9,14 @@ const Review = {
     return new Promise((resolve, reject) => {
         const timestamp = new Date();
         
-        // Check if the reviewer is the renter of the rental
+      
         const checkRentalQuery = `
             SELECT COUNT(*) AS count 
             FROM Rentals 
             WHERE  renter_id = ? AND owner_id = ?
         `;
         
-        const checkValues = [reviewer_id, reviewer_user_id]; // you need to get owner_id from the rental
+        const checkValues = [reviewer_id, reviewer_user_id]; 
 
         connection.query(checkRentalQuery, checkValues, (err, results) => {
             if (err) {
@@ -26,7 +26,7 @@ const Review = {
 
             const count = results[0].count;
             if (count > 0) {
-                // Proceed to add the review
+          
                 const query = `
                     INSERT INTO Review ( reviewer_id, reviewer_user_id, rating, comment, created_at)
                     VALUES ( ?, ?, ?, ?, ?)
@@ -53,7 +53,7 @@ const Review = {
     return new Promise((resolve, reject) => {
         const timestamp = new Date();
 
-        // Step 1: Check if the user has rented the item
+      
         const checkRentalQuery = `
             SELECT COUNT(*) AS count 
             FROM Rentals 

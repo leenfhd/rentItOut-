@@ -52,14 +52,14 @@ const Message = {
         JOIN Rentals r ON u.user_id = r.owner_id 
         WHERE r.rental_id = ?;
       `;
-//   JOIN Rentals r ON u.user_id = r.renter_id OR u.user_id = r.owner_id 
+
       connection.query(query, [id], (err, result) => {
         if (err) {
           console.error('Database query error:', err);
-          return reject(err); // Reject the promise on error
+          return reject(err); 
         }
 
-        resolve(result); // Resolve the promise with the query result
+        resolve(result); 
       });
     });
   },

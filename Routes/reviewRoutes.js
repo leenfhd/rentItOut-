@@ -17,15 +17,16 @@ const {
 }= require('../controllers/reviewController');
 
 
-  router.post("/newUserReview", addUserReview);
-  router.post("/newRentalReview", addRentalReview);
-  router.get("/RentalReview/:rental_id", viewRentalReview);
-  router.get("/UserReviews/:Userid", viewUserReviews);
-  router.put("/Info/:review_id/:reviewer_id", editReview );
-  router.delete("/Review/:review_id", deleteReviews);
+
+  router.get("/Rental/:rental_id", viewRentalReview);
+  router.get("/User/:Userid", viewUserReviews);
+  router.post("/user", addUserReview);
+  router.post("/rental", addRentalReview);
+  router.delete("/:review_id", deleteReviews);
+  router.put("/:review_id/:reviewer_id", editReview );
+  
   router.get("/data/:name", searchReview);
 
-//for coupon
   router.get('/send-coupon/:user_id', checkAndSendCoupon);
 
   router.put('/update-user-ratings', updateUserRatings);
