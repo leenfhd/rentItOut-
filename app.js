@@ -18,7 +18,7 @@ app.use(express.json());
 app.listen(PORT, () => console.log(`running on http://localhost:${PORT}`)); // to listen on the port for any api
 const connection = require("./db_connections/dbConnect");
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // or specify your Flutter app's origin
+  res.setHeader("Access-Control-Allow-Origin", "*"); 
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   next();
