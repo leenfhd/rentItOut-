@@ -3,7 +3,6 @@ const Wishlist = require("../models/wishlistModel");
 
 const router = express.Router();
 
-// Add an item to the wishlist
 router.post("/", async (req, res) => {
   const { user_id, item_id } = req.body;
   console.log(`Received request to add item: user_id=${user_id}, item_id=${item_id}`);
@@ -17,7 +16,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Get all items in a user's wishlist
+
 router.get("/:user_id", async (req, res) => {
   const { user_id } = req.params;
   try {
@@ -28,7 +27,7 @@ router.get("/:user_id", async (req, res) => {
   }
 });
 
-// Remove an item from the wishlist
+
 router.delete("/:wishlist_id", async (req, res) => {
   const { wishlist_id } = req.params;
   try {
