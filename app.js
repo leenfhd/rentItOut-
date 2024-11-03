@@ -11,6 +11,7 @@ const rentalRouter = require("./routes/rentalRouter");
 const ReviewRoutes = require("./routes/reviewRoutes.js");
 const MessageRoute = require("./routes/messageRoutes.js");
 const paymentRouter = require("./routes/paymentRoutes");
+const zegoRouter = require("./routes/zegoRouter");
 const app = express();
 const PORT = 8080;
 app.use(express.json());
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 });
 const cors = require("cors");
 app.use(cors());
+app.use("/rentItOut/video", zegoRouter);
 app.use("/rentItOut/users", userRouter);
 app.use("/rentItOut/delivery", delvireyRouter);
 app.use("/rentItOut/insurance", insuranceRouter);
