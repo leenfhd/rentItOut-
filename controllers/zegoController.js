@@ -2,8 +2,8 @@
 const ZegoExpressEngine = require('zego-express-engine-webrtc'); // Import the Zego SDK
 
 
-const appID = 283378710; // Replace with your Zego app ID
-const serverSecret = '401adb641511e816f9a02768022d321135d6c9b1659b403703a16881dffdc8ba'; // Replace with your Zego server secret
+const appID = 283378710; 
+const serverSecret = '401adb641511e816f9a02768022d321135d6c9b1659b403703a16881dffdc8ba'; 
 
 const zego = new ZegoExpressEngine(appID, serverSecret);
 
@@ -46,7 +46,7 @@ class ZegoController {
     }
   }
 
-  // Additional methods for managing calls can be added here
+
 }
 
 module.exports = new ZegoController();
