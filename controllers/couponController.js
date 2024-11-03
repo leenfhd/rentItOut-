@@ -2,7 +2,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const Coupon = require("../models/couponModel");
 
-// Create a new coupon
+
 exports.createCoupon = catchAsync(async (req, res, next) => {
   const { code, discount_percent, valid_from, valid_until } = req.body;
 
@@ -21,7 +21,7 @@ exports.createCoupon = catchAsync(async (req, res, next) => {
   });
 });
 
-// Get all coupons
+
 exports.getAllCoupons = catchAsync(async (req, res, next) => {
   const coupons = await Coupon.getAllCoupons();
 
@@ -34,7 +34,7 @@ exports.getAllCoupons = catchAsync(async (req, res, next) => {
   });
 });
 
-// Get coupon by ID
+
 exports.getCouponById = catchAsync(async (req, res, next) => {
   const coupon = await Coupon.getCouponById(req.params.id);
 
@@ -50,7 +50,7 @@ exports.getCouponById = catchAsync(async (req, res, next) => {
   });
 });
 
-// Update a coupon
+
 exports.updateCoupon = catchAsync(async (req, res, next) => {
   const updatedCoupon = await Coupon.updateCoupon(req.params.id, req.body);
 
@@ -60,7 +60,7 @@ exports.updateCoupon = catchAsync(async (req, res, next) => {
   });
 });
 
-// Delete a coupon
+
 exports.deleteCoupon = catchAsync(async (req, res, next) => {
   await Coupon.deleteCoupon(req.params.id);
 
