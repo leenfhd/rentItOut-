@@ -113,10 +113,15 @@ const registerRental = catchAsync (async(req, res,next) => {
           error: error.message,
         });
       }
+      const formattedStartDate = startDate.toISOString().split('T')[0];
+      const formattedEndDate = endDate.toISOString().split('T')[0];
+
 
       return res.status(201).json({
         message: "Your request to rent this item sent successfully to its owner,please wait for his approve",
-        rentalId: results.insertId, 
+        rentalId: results.insertId,
+        start_date: formattedStartDate,
+        end_date: formattedEndDate, 
       });
     });
     const getUser = `SELECT first_name,last_name FROM users WHERE user_id = ?`;
@@ -198,9 +203,21 @@ const getAllRentals = catchAsync(async (req, res) => {
           });
         }
 
+        const formattedResults = results.map((rental) => ({
+          rental_id:rental.rental_id,
+          item_id: rental.item_id,
+          renter_id: rental.renter_id,
+          owner_id: rental.owner_id,
+          start_date: rental.start_date,
+          end_date: rental.end_date,
+          total_price: rental.total_price,
+          late_fee: rental.late_fee,
+          status: rental.status,
+        }));
+
         return res.status(200).json({
           message: "Rentals retrieved successfully",
-          rentals: results, 
+          rentals: formattedResults, 
         });
       });
     });
@@ -369,9 +386,22 @@ const getRentals = async (req, res) => {
         });
       }
 
+      const formattedResults = results.map((rental) => ({
+        
+        rental_id:rental.rental_id,
+        item_id: rental.item_id,
+        renter_id: rental.renter_id,
+        owner_id: rental.owner_id,
+        start_date: rental.start_date,
+        end_date: rental.end_date,
+        total_price: rental.total_price,
+        late_fee: rental.late_fee,
+        status: rental.status,
+      }));
+
       return res.status(200).json({
         message: "Rentals retrieved successfully",
-        rentals: results,
+        rentals: formattedResults,
       });
     });
   } catch (error) {
@@ -434,9 +464,17 @@ const getLateRentals =catchAsync(async(req,res)=>{
           error: error.message,
         });
       }
+      const formattedResults = results.map((rental) => ({
+        rental_id:rental.rental_id,
+        item_id: rental.item_id,
+        renter_id: rental.renter_id,
+        start_date: rental.start_date,
+        end_date: rental.end_date,
+        status: rental.status,
+      }));
       return res.status(200).json({
         message: "Late rentals retrieved successfully for the owner",
-        rentals: results, 
+        rentals: formattedResults, 
       });
     });
 
