@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const zegoController = require('../controllers/zegoController');
 
-// Endpoint to start a call
+
 router.post('/start-call', async (req, res) => {
   const { userID, channelID } = req.body;
 
@@ -24,6 +24,5 @@ router.post('/end-call', async (req, res) => {
   }
 });
 
-// Additional endpoints can be added here
 
 module.exports = router;
