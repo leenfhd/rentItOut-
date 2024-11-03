@@ -5,7 +5,6 @@ const Item = require('../models/itemModel');
 const multer = require('multer');
 const path = require('path');
 
-// Configure Multer for image upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -30,14 +29,14 @@ const upload = multer({
     }
 });
 
-// Create a new item with image upload
+
 exports.createOne = [
     upload.single('image'), // Image field is handled with multer
     catchAsync(async (req, res, next) => {
         console.log("Incoming request body:", req.body);
         console.log("File data:", req.file);
 
-        // Adjust based on how your Flutter app sends data
+        
         const { name, description, category_id, owner_id, price_per_day, availability_status } = req.body; 
         const imagePath = req.file ? req.file.path : null; // Get the image path if uploaded
 
@@ -96,7 +95,7 @@ exports.getRecommendedItems = catchAsync(async (req, res, next) => {
 
         const categoryIds = categoryResults.map(row => row.category_id);
 
-        // Step 2: Find most frequent owners within these categories
+        
         const ownerSql = `
             SELECT i.owner_id, i.category_id, COUNT(*) AS rental_count
             FROM rentals r
@@ -112,7 +111,7 @@ exports.getRecommendedItems = catchAsync(async (req, res, next) => {
                 return next(new AppError("Error fetching frequent owners", 500));
             }
 
-            // Group owner IDs by category
+         
             const ownersByCategory = {};
             ownerResults.forEach(row => {
                 if (!ownersByCategory[row.category_id]) {
@@ -121,7 +120,7 @@ exports.getRecommendedItems = catchAsync(async (req, res, next) => {
                 ownersByCategory[row.category_id].push(row.owner_id);
             });
 
-            // Step 3: Fetch recommended items based on these categories and owners
+            //  Fetch recommended items based on these categories and owners
             const recommendationSql = `
                 SELECT * FROM Item
                 WHERE category_id IN (?)
@@ -189,7 +188,7 @@ exports.getItemsByOwner = catchAsync(async (req, res, next) => {
     });
 });
 
-// Get all items with optional filtering
+
 exports.getAll = catchAsync(async (req, res, next) => {
     let sql = `SELECT * FROM Item`;
     const queryParams = [];
@@ -216,14 +215,14 @@ exports.getAll = catchAsync(async (req, res, next) => {
 });
 
 
-// Update an item by ID, including the image
+
 exports.updateOne = [
     upload.single('image'), // Handle image upload
     catchAsync(async (req, res, next) => {
         const { name, description, price_per_day, availability_status, category_id, owner_id, image } = req.body; // Destructure req.body
         const item_id = req.params.id; // Get item ID from params
 
-        // Build the data object for the update
+       
         const data = { name, description, price_per_day, availability_status, category_id, owner_id, image };
 
         // If a new image is uploaded, include it in the update data
@@ -251,7 +250,7 @@ exports.updateOne = [
     })
 ];
 
-// Delete an item by ID
+
 exports.deleteOne = catchAsync(async (req, res, next) => {
     const sql = `DELETE FROM Item WHERE item_id = ?`;
 
@@ -269,7 +268,7 @@ exports.deleteOne = catchAsync(async (req, res, next) => {
     });
 });
 
-// Search items with filters
+
 exports.searchItems = catchAsync(async (req, res, next) => {
     const { name, category_id, minPrice, maxPrice, availability } = req.query;
 
