@@ -68,9 +68,9 @@ exports.createOne = [
     })
 ];
 exports.getRecommendedItems = catchAsync(async (req, res, next) => {
-    const { userId } = req.params; // User ID for whom to fetch recommendations
+    const { userId } = req.params;
 
-    // Step 1: Identify most rented categories by this user
+    // Step 1: Find most rented categories by this user
     const categorySql = `
         SELECT i.category_id, COUNT(*) AS rental_count
         FROM rentals r
@@ -78,7 +78,8 @@ exports.getRecommendedItems = catchAsync(async (req, res, next) => {
         WHERE r.renter_id = ?
         GROUP BY i.category_id
         ORDER BY rental_count DESC
-        LIMIT 3;`; // Get top 3 categories
+        LIMIT 3;
+    `;
 
     connection.query(categorySql, [userId], (err, categoryResults) => {
         if (err) {
@@ -93,24 +94,58 @@ exports.getRecommendedItems = catchAsync(async (req, res, next) => {
             });
         }
 
-        // Step 2: Fetch items in these categories that the user hasn't rented yet
         const categoryIds = categoryResults.map(row => row.category_id);
-        const recommendationSql = `
-            SELECT * FROM Item
-            WHERE category_id IN (?)
-            AND item_id NOT IN (
-                SELECT item_id FROM rentals WHERE renter_id = ?
-            )`;
 
-        connection.query(recommendationSql, [categoryIds, userId], (err, recommendedItems) => {
+        // Step 2: Find most frequent owners within these categories
+        const ownerSql = `
+            SELECT i.owner_id, i.category_id, COUNT(*) AS rental_count
+            FROM rentals r
+            JOIN Item i ON r.item_id = i.item_id
+            WHERE r.renter_id = ? AND i.category_id IN (?)
+            GROUP BY i.owner_id, i.category_id
+            ORDER BY rental_count DESC;
+        `;
+
+        connection.query(ownerSql, [userId, categoryIds], (err, ownerResults) => {
             if (err) {
                 console.error("Database error:", err);
-                return next(new AppError("Error fetching recommended items", 500));
+                return next(new AppError("Error fetching frequent owners", 500));
             }
 
-            res.status(200).json({
-                status: "success",
-                data: { recommendedItems }
+            // Group owner IDs by category
+            const ownersByCategory = {};
+            ownerResults.forEach(row => {
+                if (!ownersByCategory[row.category_id]) {
+                    ownersByCategory[row.category_id] = [];
+                }
+                ownersByCategory[row.category_id].push(row.owner_id);
+            });
+
+            // Step 3: Fetch recommended items based on these categories and owners
+            const recommendationSql = `
+                SELECT * FROM Item
+                WHERE category_id IN (?)
+                AND item_id NOT IN (
+                    SELECT item_id FROM rentals WHERE renter_id = ?
+                )
+                AND (
+                    ${categoryIds.map(categoryId => `
+                        (category_id = ${categoryId} AND owner_id IN (${ownersByCategory[categoryId] || []}))
+                    `).join(' OR ')}
+                )
+                ORDER BY FIELD(category_id, ?);
+            `;
+
+            connection.query(recommendationSql, [categoryIds, userId, categoryIds], (err, recommendedItems) => {
+                if (err) {
+                    console.error("Database error:", err);
+                    return next(new AppError("Error fetching recommended items", 500));
+                }
+
+                res.status(200).json({
+                    status: "success",
+                    data: { recommendedItems }
+                });
             });
         });
     });
