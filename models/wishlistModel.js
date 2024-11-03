@@ -1,7 +1,7 @@
 const connection = require("../db_connections/dbConnect");
 
 const Wishlist = {
-  // Add an item to the wishlist
+
   add({ user_id, item_id }) {
     const sql = `
       INSERT INTO wishlists (user_id, item_id, created_at)
@@ -17,7 +17,7 @@ const Wishlist = {
     });
   },
 
-  // Get all items in a user's wishlist
+ 
   getByUserId(user_id) {
     const sql = `
       SELECT * FROM wishlists WHERE user_id = ?
@@ -30,7 +30,7 @@ const Wishlist = {
     });
   },
 
-  // Remove an item from the wishlist
+
   remove(wishlist_id) {
     const sql = `
       DELETE FROM wishlists WHERE wishlist_id = ?
