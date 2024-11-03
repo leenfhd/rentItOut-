@@ -28,6 +28,13 @@ const registerRental = catchAsync (async(req, res,next) => {
           message: "You are not a renter. You can't ask for renting.",
         });
       }
+    const startDay = new Date(start_date);
+    const endDay = new Date(end_date);
+    if (startDay >= endDay) {
+        return res.status(400).json({
+          message: "The end date must be after the start date.",
+        });
+      } 
   
 
     const getItem = `SELECT owner_id, price_per_day, availability_status ,name as item_name  FROM item WHERE item_id = ?`;
@@ -53,13 +60,13 @@ const registerRental = catchAsync (async(req, res,next) => {
 
 
     ///check for coupon
-    if(currentDate<valid_from && currentDate>valid_until){//unavailable
+    if(startDay<valid_from || endDay>valid_until){//unavailable
           return res.status(400).json({
             message:"The coupon in not valid for thr current date"
           })
     }
     //Check for availability of the item
-    if(availability_status !="available"){
+
       const itemRentingHistory = `SELECT end_date FROM rentals Where item_id=? and status='ongoing' ORDER BY end_date DESC LIMIT 1`;
 
       const [itemHistory]=await db.promise().query(itemRentingHistory,[item_id]);
@@ -76,7 +83,7 @@ const registerRental = catchAsync (async(req, res,next) => {
           return res.status(400).json({
             message: "Item is currently unavailable for new rentals.",
           });
-        }
+        
 
     }
 
