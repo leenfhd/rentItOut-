@@ -1,7 +1,8 @@
-const { request } = require("express");
+const { request } = require('express');
 const multer = require("multer");
-const Message = require("../models/messageSchema.js");
-const jwt = require("jsonwebtoken");
+const Message=require('../models/messageSchema.js');
+const jwt = require('jsonwebtoken');
+ 
 
 // Configure multer for handling file uploads
 const storage = multer.diskStorage({
@@ -16,43 +17,44 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+
+
+
 exports.viewUserOFItem = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { itemId } = req.params;
 
     // Call the model function to fetch user data
-    const result = await Message.getUserDetailsOfItem(id);
+    const result = await Message.getUserDetailsOfItem(itemId);
 
     if (result && result.length > 0) {
       res.status(200).json(result);
     } else {
-      res
-        .status(404)
-        .json({ message: "No user data found for the given rental ID" });
+      res.status(404).json({ message: "No user data found for the given rental ID" });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-exports.saveMsg = [
-  upload.single("imageFile"),
-  async (req, res, next) => {
-    try {
-      const result = await Message.createMSG(req, req.body);
 
-      if (result && result.affectedRows > 0) {
-        res.status(200).json({ message: "Message sent successfully" });
-      } else {
-        res.status(404).json({ message: "Message sending failed" });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+
+exports.saveMsg = [upload.single("imageFile"), async (req, res, next) => {
+  try {
+    const result = await Message.createMSG(req, req.body);
+
+    if (result && result.affectedRows > 0) {
+      res.status(200).json({ message: "Message sent successfully" });
+    } else {
+      res.status(404).json({ message: "Message sending failed" });
     }
-  },
-];
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}];
+ 
 
 exports.userDetailsChat = async (req, res, next) => {
   try {
@@ -72,6 +74,8 @@ exports.userDetailsChat = async (req, res, next) => {
   }
 };
 
+
+
 //function to create a token for the user
 const createToken = (userId) => {
   // Set the token payload
@@ -85,6 +89,7 @@ const createToken = (userId) => {
   return token;
 };
 
+ 
 exports.fetchMsg = async (req, res, next) => {
   try {
     const { senderId, recepientId } = req.params;
@@ -103,21 +108,23 @@ exports.fetchMsg = async (req, res, next) => {
   }
 };
 
-exports.viewAdmin = async (req, res, next) => {
-  try {
-    // Call the model function to fetch admins
-    const admins = await Message.getAdmins();
+// exports.viewAdmin = async (req, res, next) => {
+//   try {
+//     // Call the model function to fetch admins
+//     const admins = await Message.getAdmins();
 
-    res.status(200).json({
-      success: true,
-      admins, // returning the result as "admins"
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       admins, // returning the result as "admins"
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
+
+ 
 exports.viewAllUser = async (req, res, next) => {
   try {
     // Call the model function to fetch all users
@@ -132,21 +139,22 @@ exports.viewAllUser = async (req, res, next) => {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-};
+}; 
+
+
 
 exports.deleteMessages = async (req, res, next) => {
   try {
-    const { message_id } = req.body;
+    const { message_id } = req.params;
 
-    // Call the model function to delete the message
+    if (!message_id) {
+      return res.status(400).json({ error: "Message ID is required" });
+    }
+
     const result = await Message.deleteMessage(message_id);
 
-    // Check the result and respond accordingly
     if (result.affectedRows > 0) {
-      res.json({
-        message: "Message deleted successfully",
-        affectedRows: result.affectedRows,
-      });
+      res.json({ message: "Message deleted successfully", affectedRows: result.affectedRows });
     } else {
       res.status(404).json({ message: "Message not found" });
     }
@@ -155,3 +163,8 @@ exports.deleteMessages = async (req, res, next) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+ 
+ 
+
+
