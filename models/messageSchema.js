@@ -2,15 +2,20 @@ const bcrypt = require("bcrypt");
 const connection = require("../db_connections/dbConnect");
 const Message = {
   // Method to create a new user
-  createMSG(req, { sender_id, receiver_id, rental_id, messageType, content }) {
+  createMSG(req, {
+    sender_id,
+    receiver_id,
+    rental_id,
+    messageType,
+    content
+  }) {
     return new Promise((resolve, reject) => {
       const timestamp = new Date();
-      const imageUrl =
-        messageType === "image" && req.file ? req.file.path : null;
+      const imageUrl = (messageType === "image" && req.file) ? req.file.path : null;
       const message_id = Math.floor(Math.random() * 1000000); // Generate a random ID
 
       const sql = `
-        INSERT INTO Message (message_id, sender_id, receiver_id, rental_id, content, createed_at, messageType, imageURL)
+        INSERT INTO Message (message_id, sender_id, receiver_id, rental_id, content, created_at, messageType, imageURL)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
@@ -22,7 +27,7 @@ const Message = {
         content || null,
         timestamp,
         messageType,
-        imageUrl || null,
+        imageUrl || null
       ];
 
       connection.query(sql, values, (err, result) => {
@@ -35,6 +40,8 @@ const Message = {
         resolve(result);
       });
     });
+   
+   
   },
 
   getUserDetailsOfItem(id) {
@@ -45,14 +52,14 @@ const Message = {
         JOIN Rentals r ON u.user_id = r.owner_id 
         WHERE r.rental_id = ?;
       `;
-      //   JOIN Rentals r ON u.user_id = r.renter_id OR u.user_id = r.owner_id
+
       connection.query(query, [id], (err, result) => {
         if (err) {
-          console.error("Database query error:", err);
-          return reject(err); // Reject the promise on error
+          console.error('Database query error:', err);
+          return reject(err); 
         }
 
-        resolve(result); // Resolve the promise with the query result
+        resolve(result); 
       });
     });
   },
@@ -63,7 +70,7 @@ const Message = {
 
       connection.query(query, [userId], (err, result) => {
         if (err) {
-          console.error("Database query error:", err);
+          console.error('Database query error:', err);
           return reject(err); // Reject the promise on error
         }
 
@@ -76,6 +83,9 @@ const Message = {
     });
   },
 
+
+
+
   getMessages(senderId, recepientId) {
     return new Promise((resolve, reject) => {
       const query = `
@@ -84,12 +94,12 @@ const Message = {
         JOIN Users u ON m.sender_id = u.user_id
         WHERE (m.sender_id = ? AND m.receiver_id = ?)
            OR (m.sender_id = ? AND m.receiver_id = ?)
-        ORDER BY m.createed_at ASC
+        ORDER BY m.created_at ASC
       `;
 
       connection.query(
-        query,
-        [senderId, recepientId, recepientId, senderId],
+        query, 
+        [senderId, recepientId, recepientId, senderId], 
         (err, messages) => {
           if (err) {
             console.error("Database query error:", err);
@@ -117,6 +127,7 @@ const Message = {
     });
   },
 
+
   getAllUsers() {
     return new Promise((resolve, reject) => {
       const query = `SELECT * FROM Users`;
@@ -132,19 +143,21 @@ const Message = {
     });
   },
 
-  deleteReview(message_id) {
+
+  deleteMessage: (message_id) => {
     return new Promise((resolve, reject) => {
-      const query = `DELETE FROM Review WHERE review_id = ?`;
-
-      connection.query(query, [review_id], (err, result) => {
+      const query = `DELETE FROM Message WHERE message_id = ?`;
+      connection.query(query, [message_id], (err, result) => {
         if (err) {
-          console.error("Database query error:", err);
-          return reject(err); // Reject the promise on error
+          console.error("Error executing delete query:", err);
+          return reject(err);
         }
-
-        resolve(result); // Resolve the promise with the result
+        resolve(result);
       });
     });
   },
+
+
+
 };
 module.exports = Message;
