@@ -1,6 +1,6 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-
+ 
 // const reviewController = require('../controllers/reviewController'); // Adjust path if necessary
 // router.get('/rental/:rental_id/reviews', reviewController.viewRentalReview);
 
@@ -9,18 +9,30 @@ const {
   addRentalReview,
   viewRentalReview,
   viewUserReviews,
-  editReview,
+  editReview ,
   deleteReviews,
   searchReview,
-} = require("../controllers/reviewController");
+  checkAndSendCoupon,
+  updateUserRatings 
+}= require('../controllers/reviewController');
 
-router.post("/newUserReview", addUserReview);
-router.post("/newRentalReview", addRentalReview);
-router.get("/RentalReview/:rental_id", viewRentalReview);
-router.get("/UserReviews/:Userid", viewUserReviews);
-router.put("/Review/Info/:review_id", editReview);
-// router.put('/editRentalReviews', editRentalReviews);
-router.post("/Review/:review_id", deleteReviews);
-router.get("/Review/data/:name", searchReview);
+
+
+  router.get("/Rental/:rental_id", viewRentalReview);
+  router.get("/User/:Userid", viewUserReviews);
+  router.post("/user", addUserReview);
+  router.post("/rental", addRentalReview);
+  router.delete("/:review_id", deleteReviews);
+  router.put("/:review_id/:reviewer_id", editReview );
+  
+  router.get("/data/:name", searchReview);
+
+  router.get('/send-coupon/:user_id', checkAndSendCoupon);
+
+  router.put('/update-user-ratings', updateUserRatings);
+ 
+
+
+
 
 module.exports = router;
